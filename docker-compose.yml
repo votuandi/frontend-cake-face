@@ -1,0 +1,29 @@
+version: '3'
+services:
+    kyanhnguyen-nginx:
+        ports:
+            - "80:80"
+            - "443:443"
+        container_name: kyanhnguyen-nginx
+        restart: always
+        image: nginx:latest
+        volumes:
+            - ./default.conf:/etc/nginx/conf.d/default.conf
+            - ./private.key:/etc/nginx/ssl/private.key
+            - ./bundle.crt:/etc/nginx/ssl/bundle.crt
+        links:
+            - kyanhnguyen-web
+        deploy:
+            resources:
+                limits:
+                    cpus: '0.5'
+                    memory: 512M
+    kyanhnguyen-web:
+        container_name: kyanhnguyen-web
+        restart: always
+        image: kyanhnguyen-web-img:1.0.0
+        deploy:
+            resources:
+                limits:
+                    cpus: '0.5'
+                    memory: 512M

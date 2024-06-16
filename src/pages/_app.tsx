@@ -20,6 +20,7 @@ import { CssBaseline, ThemeProvider } from '@mui/material'
 import theme from '@/assets/theme/theme.default'
 import { Provider } from 'react-redux'
 import store from '@/store'
+import useAuth from '@/hooks/useAuth'
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (
@@ -41,6 +42,7 @@ const clientSideEmotionCache = createEmotionCache()
 const tssClientSideEmotionCache = createTssEmotionCache()
 
 const MyApp: React.FunctionComponent<MyAppProps> = (props) => {
+  useAuth()
   const {
     Component,
     emotionCache = clientSideEmotionCache,
