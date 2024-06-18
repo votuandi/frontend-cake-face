@@ -3,9 +3,8 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import { useIsMounted } from 'usehooks-ts'
-import Slider from 'react-slick'
 import useStyles from './Home.style'
-import { Box } from '@mui/material'
+import { Box, Container } from '@mui/material'
 import AppBanner from '@/components/AppBanner'
 
 const TAB_TITLES = ['News', 'Promotion']
@@ -30,30 +29,18 @@ export default function Home() {
   let isMounted = useIsMounted()
 
   return (
-    <Box
+    <Container
+      maxWidth="lg"
       sx={{
-        minHeight: '100vh',
-        width: '100vw',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f4f0ed',
-        color: 'black',
+        justifyContent: 'start',
+        alignItems: 'start',
+        marginTop: '60px',
       }}
     >
+      {/* <Box sx={{ width: '100%', aspectRatio: 3.4, background: 'red' }}></Box> */}
       <AppBanner />
-      <Box
-        sx={{
-          height: '150vh',
-          width: '100vw',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        Coming soon
-      </Box>
-    </Box>
+    </Container>
   )
 }

@@ -1,4 +1,4 @@
-import commonAxios from '@/utils/axios/commom.axios'
+import commonAxios from '@/utils/axios/json.axios'
 import formDataAxios from '@/utils/axios/form-data.axios'
 import type { AxiosResponseData } from '@/utils/axios'
 import { CREATE_CATEGORY_DTO, UPDATE_CATEGORY_DTO } from './category.api.types'

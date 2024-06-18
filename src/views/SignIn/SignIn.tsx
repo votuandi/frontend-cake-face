@@ -14,7 +14,19 @@ import { authApi } from '@/utils/api'
 import { LOGIN_RESPONSE } from '@/utils/api/auth'
 import { getCookie, setCookie } from '@/utils/helpers/cookie'
 import { gotoPage } from '@/utils/helpers/common'
-import { COOKIE_ACCESS_TOKEN, COOKIE_AVATAR, COOKIE_REFRESH_TOKEN, COOKIE_USER_ID, COOKIE_USER_NAME, COOKIE_USER_ROLE, COOKIE_USERNAME } from '@/utils/constants/cookie.constant'
+import {
+  COOKIE_ACCESS_TOKEN,
+  COOKIE_AVATAR,
+  COOKIE_REFRESH_TOKEN,
+  COOKIE_USER_ID,
+  COOKIE_USER_NAME,
+  COOKIE_USER_ROLE,
+  COOKIE_USERNAME,
+  MAX_AGE,
+} from '@/utils/constants/cookie.constant'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '@/store/rootReducer'
+import { getCurrentUserInfo } from '@/store/user/user.action'
 
 interface LoginFormValues {
   username: string
@@ -34,6 +46,8 @@ const validationSchema = Yup.object({
 export default function Contact() {
   const { t, i18n } = useTranslation()
   const locale = i18n.language
+  const dispatch = useDispatch()
+  const { currentUserInfo } = useSelector((state: RootState) => state.user)
 
   const formik = useFormik({
     initialValues: DEFAULT_INITIAL_VALUE,
@@ -46,14 +60,13 @@ export default function Contact() {
         })
         if (res.status === 200 && res.data.status) {
           let loginData: LOGIN_RESPONSE = res.data.params
-          let maxAge = 7 * 24 * 60 * 60
-          setCookie(COOKIE_USERNAME, loginData.user.userName, { maxAge })
-          setCookie(COOKIE_USER_NAME, loginData.user.name, { maxAge })
-          setCookie(COOKIE_AVATAR, loginData.user.avatar, { maxAge })
-          setCookie(COOKIE_USER_ID, loginData.user.id, { maxAge })
-          setCookie(COOKIE_USER_ROLE, loginData.user.role, { maxAge })
-          setCookie(COOKIE_ACCESS_TOKEN, loginData.accessToken, { maxAge })
-          setCookie(COOKIE_REFRESH_TOKEN, loginData.refreshToken, { maxAge })
+          setCookie(COOKIE_USERNAME, loginData.user.userName, { maxAge: MAX_AGE })
+          setCookie(COOKIE_USER_NAME, loginData.user.name, { maxAge: MAX_AGE })
+          setCookie(COOKIE_AVATAR, loginData.user.avatar, { maxAge: MAX_AGE })
+          setCookie(COOKIE_USER_ID, loginData.user.id, { maxAge: MAX_AGE })
+          setCookie(COOKIE_USER_ROLE, loginData.user.role, { maxAge: MAX_AGE })
+          setCookie(COOKIE_ACCESS_TOKEN, loginData.accessToken, { maxAge: MAX_AGE })
+          setCookie(COOKIE_REFRESH_TOKEN, loginData.refreshToken, { maxAge: MAX_AGE })
           gotoPage('/')
         }
         setSubmitting(false)
@@ -63,6 +76,19 @@ export default function Contact() {
       }
     },
   })
+
+  useEffect(() => {
+    if (!isMounted()) {
+      dispatch(getCurrentUserInfo())
+    }
+  }, [])
+
+  useEffect(() => {
+    if (currentUserInfo) {
+      alert(`Chào ${currentUserInfo.name}!\nBạn đã đăng nhập trước đó!`)
+      gotoPage('/')
+    }
+  }, [currentUserInfo])
 
   const { classes } = useStyles({ params: {} })
   let isMounted = useIsMounted()

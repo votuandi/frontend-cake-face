@@ -1,4 +1,4 @@
-import commonAxios from '@/utils/axios/commom.axios'
+import commonAxios from '@/utils/axios/json.axios'
 import type { AxiosResponseData } from '@/utils/axios'
 import { LOGIN_PAYLOAD } from './auth.api.types'
 

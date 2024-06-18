@@ -6,12 +6,10 @@ const useStyles = makeStyles({
 })((theme, _, classes) => {
   return {
     root: {
-      width: '100vw',
-      height: '100vh',
+      width: '100%',
     },
     bannerImage: {
-      width: '100vw',
-      height: '100vh',
+      width: '100%',
     },
   }
 })

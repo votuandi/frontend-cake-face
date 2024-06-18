@@ -1,10 +1,8 @@
 import { combineReducers } from '@reduxjs/toolkit'
-import schoolReducer from './school/school.reducer'
-import serviceReducer from './service/service.reducer'
+import userReducer from './user/user.reducer'
 
 const rootReducer = combineReducers({
-  school: schoolReducer,
-  service: serviceReducer,
+  user: userReducer,
 })
 
 export type RootState = ReturnType<typeof rootReducer>

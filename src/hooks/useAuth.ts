@@ -8,8 +8,8 @@ const PUBLIC_PAGES = ['/', '/sign-in']
 
 const rolePermissions: Record<Role, string[]> = {
   admin: ['/admin', ...PUBLIC_PAGES], // admin can access all pages
-  client: PUBLIC_PAGES,
-  user: PUBLIC_PAGES,
+  client: [...PUBLIC_PAGES],
+  user: [...PUBLIC_PAGES],
 }
 
 // Check if a given path is accessible based on role
@@ -26,10 +26,6 @@ const useAuth = () => {
     const accessToken = cookies.get(COOKIE_ACCESS_TOKEN)
     const refreshToken = cookies.get(COOKIE_REFRESH_TOKEN)
     const userRole = cookies.get(COOKIE_USER_ROLE)
-
-    console.log('accessToken', accessToken)
-    console.log('refreshToken', refreshToken)
-    console.log('userRole', userRole)
 
     if (!accessToken || !refreshToken || !userRole) {
       // No tokens, user is not logged in

@@ -33,7 +33,13 @@ const Main = (props: MainProps) => {
       <Box
         sx={{
           minHeight: '100vh',
-          width: '100vw',
+          width: '100%',
+          height: '100%',
+          backgroundColor: '#fff',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'start',
+          alignItems: 'start',
         }}
       >
         {children}

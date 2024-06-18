@@ -1,12 +1,14 @@
-import { API_HOST } from '../configs/common'
 import axios from 'axios'
-
 import { commonConfig } from '../configs'
 import { commonHelpers } from '../helpers'
+import Cookies from 'universal-cookie'
+import { COOKIE_ACCESS_TOKEN, COOKIE_REFRESH_TOKEN, MAX_AGE } from '../constants/cookie.constant'
+import { cleanCookie, setCookie } from '../helpers/cookie'
 
-// const formDataAxios = axios.create({
-//   baseURL: `${commonConfig.API_HOST}`,
-// })
+const cookies = new Cookies()
+
+const accessToken = cookies.get(COOKIE_ACCESS_TOKEN)
+const refreshToken = cookies.get(COOKIE_REFRESH_TOKEN)
 
 const formDataAxios = axios.create({
   baseURL: `${commonConfig.API_HOST}`,
@@ -14,10 +16,13 @@ const formDataAxios = axios.create({
 
 formDataAxios.interceptors.request.use(
   (req) => {
+    if (accessToken) {
+      req.headers.Authorization = `Bearer ${accessToken}`
+    }
+
     switch ((req.method as string).toUpperCase()) {
       case 'GET': {
         req.params = req.params || {}
-        // Object.assign(req.params, {});
         break
       }
       case 'POST': {
@@ -47,8 +52,36 @@ formDataAxios.interceptors.response.use(
   (res) => {
     return res
   },
-  (err) => {
+  async (err) => {
     console.log(err)
+    const originalRequest = err.config
+
+    if (err.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true
+
+      if (refreshToken) {
+        try {
+          const { data } = await axios.post(`${commonConfig.API_HOST}/auth/refresh`, { refreshToken })
+
+          // Update cookies with new tokens
+          setCookie(COOKIE_ACCESS_TOKEN, data.accessToken, { maxAge: MAX_AGE })
+          setCookie(COOKIE_REFRESH_TOKEN, data.refreshToken, { maxAge: MAX_AGE })
+
+          // Update Authorization header with new access token
+          formDataAxios.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`
+          originalRequest.headers['Authorization'] = `Bearer ${data.accessToken}`
+
+          return formDataAxios(originalRequest)
+        } catch (refreshError: any) {
+          if (refreshError.response && refreshError.response.status === 403) {
+            cleanCookie()
+            alert('Phiên đăng nhập hết hạn!')
+          }
+          return Promise.reject(refreshError)
+        }
+      }
+    }
+
     return Promise.reject(err)
   }
 )

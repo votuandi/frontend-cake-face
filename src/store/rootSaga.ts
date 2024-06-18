@@ -1,8 +1,6 @@
 import { all, fork } from 'redux-saga/effects'
-
-import schoolSaga from './school/school.saga'
-import serviceSaga from './service/service.saga'
+import userSaga from './user/user.saga'
 
 export default function* rootSaga() {
-  yield all([fork(schoolSaga), fork(serviceSaga)])
+  yield all([fork(userSaga)])
 }
