@@ -1,4 +1,6 @@
 export { default as categoryApi } from './category'
+export { default as cakeFaceApi } from './cakeFace'
+export { default as optionApi } from './option'
 export { default as schoolApi } from './school'
 export { default as authApi } from './auth'
 export { default as userApi } from './user'

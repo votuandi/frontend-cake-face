@@ -23,6 +23,7 @@ const Main = (props: MainProps) => {
         width: '100vw',
         display: 'flex',
         flexDirection: 'row',
+        backgroundColor: '#fff',
       }}
     >
       {!isSmallScreen && <AppAdminMenu />}

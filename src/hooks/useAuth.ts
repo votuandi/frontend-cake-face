@@ -14,6 +14,10 @@ const rolePermissions: Record<Role, string[]> = {
 
 // Check if a given path is accessible based on role
 const isPathAccessible = (role: Role, path: string): boolean => {
+  if (role === 'admin' && path.startsWith('/admin')) {
+    return true
+  }
+
   const accessiblePaths = rolePermissions[role] || []
   return accessiblePaths.includes(path)
 }

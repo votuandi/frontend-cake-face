@@ -3,14 +3,10 @@ import * as React from 'react'
 import { FormControlLabel, Checkbox, CheckboxProps, Box, Button, Typography } from '@mui/material'
 import useStyles from './AppAdminMenu.styles'
 import router, { useRouter } from 'next/router'
-import { ADMIN_MENU, MENU, MENU_ITEM_TYPE } from '@/utils/constants/menu.constant'
-import { gotoPage, localStorageAvailable } from '@/utils/helpers/common'
+import { ADMIN_MENU } from '@/utils/constants/menu.constant'
+import { gotoPage } from '@/utils/helpers/common'
 import { useTranslation } from 'next-i18next'
-import { useEffect, useState } from 'react'
-import { useMediaQuery } from '@mui/material'
-import theme from '@/assets/theme'
-import MenuIcon from '@mui/icons-material/Menu'
-import IconButton from '@mui/material/IconButton'
+import Link from 'next/link'
 
 type IProps = {}
 
@@ -27,43 +23,48 @@ const AppAdminMenu = (props: IProps, ref: React.ForwardedRef<any>) => {
       sx={{
         width: '360px',
         height: '100vh',
-        backgroundColor: '#51000b',
+        // backgroundColor: '#26787c10',
         displayL: 'flex',
         flexDirection: 'column',
         // padding: '16px 12px',
-        boxShadow: 'rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px',
-        // borderRight: '1px solid #2b303b',
+        boxShadow: 'rgba(106, 188, 182, 0.2) 0px 19px 38px, rgba(106, 188, 182, 0.2) 0px 15px 12px',
+        borderRight: '1px solid rgba(106, 188, 182, 0.3)',
         overflow: 'auto',
+        fontFamily: 'Open Sans',
       }}
     >
       <Box
         sx={{
-          fontFamily: 'Mulish',
           color: 'white',
           textAlign: 'center',
-          backgroundColor: '#62000D',
+          // backgroundColor: '#26787c50',
           py: '36px',
-          cursor: 'pointer',
+          // cursor: 'pointer',
           fontWeight: 500,
           fontSize: '18px',
+
+          '& .logo': {
+            width: '60%',
+          },
         }}
       >
-        KY ANH NGUYEN
+        <Link href="/">
+          <img className="logo" src="/image/abaso-full-logo.png" alt="" />
+        </Link>
       </Box>
       {ADMIN_MENU.map((item, index) => {
         return (
           <Box
             sx={{
               padding: '16px 24px',
-              backgroundColor: router.pathname.split('/').reverse()[0] === item.path.split('/').reverse()[0] ? '#880012' : '#51000b',
-              color: router.pathname.split('/').reverse()[0] === item.path.split('/').reverse()[0] ? '#fff' : '#ccc',
+              backgroundColor: router.pathname.split('/').reverse()[0] === item.path.split('/').reverse()[0] ? 'rgb(106, 188, 182, 0.6)' : '#fff',
+              color: router.pathname.split('/').reverse()[0] === item.path.split('/').reverse()[0] ? '#1f5254' : '#1f5254',
               fontWeight: router.pathname.split('/').reverse()[0] === item.path.split('/').reverse()[0] ? 800 : 400,
-              fontFamily: 'Mulish',
               cursor: 'pointer',
 
               '&:hover': {
-                backgroundColor: '#ffffffa7',
-                color: '#880012',
+                backgroundColor: 'rgb(106, 188, 182, 0.2)',
+                color: '#1f5254',
                 fontWeight: router.pathname.split('/').reverse()[0] === item.path.split('/').reverse()[0] ? 800 : 600,
               },
             }}

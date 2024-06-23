@@ -1,14 +1,40 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
+import { Suspense, startTransition } from 'react'
+import dynamic from 'next/dynamic'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
-const inter = Inter({ subsets: ['latin'] })
+import LayoutAdmin from '@/layouts/Admin'
 
-export default function Home() {
+import type { NextPageWithLayout } from '@/pages/_app'
+import type { GetServerSideProps, GetStaticProps, InferGetServerSidePropsType } from 'next'
+// import pageStructuresApi from "@/utils/api/pageStructures/pageStructures.api";
+import { NextSeo } from 'next-seo'
+
+type ISeoProps = {
+  title: string
+  description: string
+}
+
+export const getServerSideProps = (async ({ locale }) => {
+  return {
+    props: { ...(await serverSideTranslations(locale || '')) },
+  }
+}) satisfies GetServerSideProps<{}>
+
+const ViewAdmin = dynamic(() => import('@/views/Admin'), {
+  suspense: true,
+  ssr: false,
+})
+
+const Admin: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = (props) => {
   return (
-    <>
-      <h1>ADMIN PAGE...</h1>
-    </>
+    <Suspense fallback="...">
+      <ViewAdmin />
+    </Suspense>
   )
 }
+
+Admin.getLayout = (page) => {
+  return <LayoutAdmin>{page}</LayoutAdmin>
+}
+
+export default Admin

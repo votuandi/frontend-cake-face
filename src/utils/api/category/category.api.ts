@@ -1,32 +1,32 @@
-import commonAxios from '@/utils/axios/json.axios'
+import jsonAxios from '@/utils/axios/json.axios'
 import formDataAxios from '@/utils/axios/form-data.axios'
 import type { AxiosResponseData } from '@/utils/axios'
-import { CREATE_CATEGORY_DTO, UPDATE_CATEGORY_DTO } from './category.api.types'
+import { CREATE_CATEGORY_DTO, GET_CATEGORY_LIST_PAYLOAD, UPDATE_CATEGORY_DTO } from './category.api.types'
+import { parseParams } from '@/utils/helpers/common'
 
 const categoryApi = {
-  getList: () => {
-    return commonAxios.get<AxiosResponseData>('/categories')
+  getList: (payload: GET_CATEGORY_LIST_PAYLOAD) => {
+    return jsonAxios.get<AxiosResponseData>(`/cake-face-category${Object.entries(payload.params).length > 0 ? `?${parseParams(payload.params)}` : ''}`)
   },
 
   getById: (id: string) => {
-    return commonAxios.get<AxiosResponseData>(`/categories/${id}`)
+    return jsonAxios.get<AxiosResponseData>(`/cake-face-category/${id}`)
   },
 
   createCategory: (payload: CREATE_CATEGORY_DTO) => {
-    return formDataAxios.post<AxiosResponseData>('/categories/', {
+    return formDataAxios.post<AxiosResponseData>('/cake-face-category/', {
       ...payload.params,
     })
   },
 
   updateCategory: (id: string, payload: UPDATE_CATEGORY_DTO) => {
-    return formDataAxios.put<AxiosResponseData>(`/categories/${id}`, {
+    return formDataAxios.put<AxiosResponseData>(`/cake-face-category/${id}`, {
       ...payload.params,
     })
   },
 
   deleteById: (id: string) => {
-    return commonAxios.delete<AxiosResponseData>(`/categories/${id}`)
+    return jsonAxios.delete<AxiosResponseData>(`/cake-face-category/${id}`)
   },
 }
-
 export default categoryApi

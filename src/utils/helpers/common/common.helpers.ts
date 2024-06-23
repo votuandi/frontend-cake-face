@@ -195,3 +195,9 @@ export const convertToEmbedPreview = (url: string): string | null => {
     return null
   }
 }
+
+export const parseParams = (params: Object) => {
+  return Object.entries(params)
+    .map((x) => `${x[0]}=${x[1]}`)
+    .join('&')
+}

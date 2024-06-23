@@ -7,15 +7,15 @@ import { cleanCookie, setCookie } from '../helpers/cookie'
 
 const cookies = new Cookies()
 
-const accessToken = cookies.get(COOKIE_ACCESS_TOKEN)
-const refreshToken = cookies.get(COOKIE_REFRESH_TOKEN)
-
 const formDataAxios = axios.create({
   baseURL: `${commonConfig.API_HOST}`,
 })
 
+let refreshTokenPromise: any = null
+
 formDataAxios.interceptors.request.use(
   (req) => {
+    const accessToken = cookies.get(COOKIE_ACCESS_TOKEN)
     if (accessToken) {
       req.headers.Authorization = `Bearer ${accessToken}`
     }
@@ -59,24 +59,43 @@ formDataAxios.interceptors.response.use(
     if (err.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
 
+      const refreshToken = cookies.get(COOKIE_REFRESH_TOKEN)
       if (refreshToken) {
+        if (!refreshTokenPromise) {
+          refreshTokenPromise = axios
+            .post(`${commonConfig.API_HOST}/auth/refresh`, { refreshToken })
+            .then(({ data }) => {
+              console.log('REFRESH DATA', data)
+
+              // Update cookies with new tokens
+              setCookie(COOKIE_ACCESS_TOKEN, data.accessToken, { maxAge: MAX_AGE })
+              setCookie(COOKIE_REFRESH_TOKEN, data.refreshToken, { maxAge: MAX_AGE })
+
+              // Update Authorization header with new access token
+              formDataAxios.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`
+              originalRequest.headers['Authorization'] = `Bearer ${data.accessToken}`
+
+              return data.accessToken
+            })
+            .catch((refreshError) => {
+              if (refreshError.response && refreshError.response.status === 403) {
+                cleanCookie()
+                alert('Phiên đăng nhập hết hạn!')
+              }
+              return Promise.reject(refreshError)
+            })
+            .finally(() => {
+              refreshTokenPromise = null
+            })
+        }
+
         try {
-          const { data } = await axios.post(`${commonConfig.API_HOST}/auth/refresh`, { refreshToken })
-
-          // Update cookies with new tokens
-          setCookie(COOKIE_ACCESS_TOKEN, data.accessToken, { maxAge: MAX_AGE })
-          setCookie(COOKIE_REFRESH_TOKEN, data.refreshToken, { maxAge: MAX_AGE })
-
-          // Update Authorization header with new access token
-          formDataAxios.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`
-          originalRequest.headers['Authorization'] = `Bearer ${data.accessToken}`
-
-          return formDataAxios(originalRequest)
-        } catch (refreshError: any) {
-          if (refreshError.response && refreshError.response.status === 403) {
-            cleanCookie()
-            alert('Phiên đăng nhập hết hạn!')
+          const newAccessToken = await refreshTokenPromise
+          if (newAccessToken) {
+            originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`
+            return formDataAxios(originalRequest)
           }
+        } catch (refreshError) {
           return Promise.reject(refreshError)
         }
       }
