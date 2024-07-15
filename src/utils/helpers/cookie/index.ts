@@ -16,8 +16,10 @@ export const setCookie = (name: string, value: string, options?: CookieOptions) 
   cookies.set(name, value, {
     path: '/',
     sameSite: 'strict',
-    httpOnly: process.env.NODE_ENV === 'production',
-    secure: process.env.NODE_ENV === 'production',
+    // httpOnly: process.env.NODE_ENV === 'production',
+    // secure: process.env.NODE_ENV === 'production',
+    httpOnly: false,
+    secure: false,
     ...options,
   })
 }
@@ -30,8 +32,8 @@ export const removeCookie = (name: string, options?: CookieOptions) => {
   cookies.remove(name, {
     path: '/',
     sameSite: 'strict',
-    httpOnly: process.env.NODE_ENV === 'production',
-    secure: process.env.NODE_ENV === 'production',
+    httpOnly: false,
+    secure: false,
     ...options,
   })
 }

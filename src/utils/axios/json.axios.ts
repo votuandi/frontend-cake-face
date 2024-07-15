@@ -19,6 +19,8 @@ let refreshTokenPromise: any = null
 jsonAxios.interceptors.request.use(
   (req) => {
     const accessToken = cookies.get(COOKIE_ACCESS_TOKEN)
+    console.log(accessToken)
+
     if (accessToken) {
       req.headers.Authorization = `Bearer ${accessToken}`
     }

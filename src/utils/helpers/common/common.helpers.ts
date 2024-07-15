@@ -28,7 +28,10 @@ export const formatFormData = (data: Object) => {
   const fd = new FormData()
   Object.entries(data).forEach(([key, value]) => {
     if (Array.isArray(value) && value.some((v) => typeof window !== 'undefined' && v instanceof File)) {
-      fd.append(`${key}[]`, value as any)
+      // fd.append(`${key}`, value as any)
+      for (let valueItem of value) {
+        fd.append(key, typeof valueItem === 'string' || (typeof window !== 'undefined' && valueItem instanceof File) ? valueItem : JSON.stringify(valueItem))
+      }
     } else {
       fd.append(key, typeof value === 'string' || (typeof window !== 'undefined' && value instanceof File) ? value : JSON.stringify(value))
     }

@@ -7,6 +7,9 @@ import {
   getCakeFaceListFailure,
   getCakeFaceListRequested,
   getCakeFaceListSuccess,
+  getTrendyCakeFaceListFailure,
+  getTrendyCakeFaceListRequested,
+  getTrendyCakeFaceListSuccess,
 } from './cakeFace.action'
 import { CAKE_FACE_ITEM_TYPE } from '@/utils/api/cakeFace'
 
@@ -20,6 +23,10 @@ const initialState: CakeFaceState = {
   cakeFaceDetail: null,
   cakeFaceDetailLoading: false,
   cakeFaceDetailError: null,
+
+  trendyCakeFaceList: [],
+  trendyCakeFaceListLoading: false,
+  trendyCakeFaceListError: null,
 }
 
 const cakeFaceReducer = createReducer(initialState, (builder) => {
@@ -37,6 +44,19 @@ const cakeFaceReducer = createReducer(initialState, (builder) => {
     .addCase(getCakeFaceListFailure, (state, action: PayloadAction<string>) => {
       state.cakeFaceListLoading = false
       state.cakeFaceListError = action.payload
+    })
+
+    .addCase(getTrendyCakeFaceListRequested, (state) => {
+      state.trendyCakeFaceListLoading = true
+      state.trendyCakeFaceListError = null
+    })
+    .addCase(getTrendyCakeFaceListSuccess, (state, action: PayloadAction<CAKE_FACE_ITEM_TYPE[]>) => {
+      state.trendyCakeFaceListLoading = false
+      state.trendyCakeFaceList = action.payload
+    })
+    .addCase(getTrendyCakeFaceListFailure, (state, action: PayloadAction<string>) => {
+      state.trendyCakeFaceListLoading = false
+      state.trendyCakeFaceListError = action.payload
     })
 
     .addCase(getCakeFaceDetailRequested, (state) => {

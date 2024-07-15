@@ -20,8 +20,6 @@ const cakeFaceApi = {
   },
 
   updateCakeFace: (id: string, payload: UPDATE_CAKE_FACE_DTO) => {
-    console.log('IIIIIII', id)
-
     return formDataAxios.put<AxiosResponseData>(`/cake-face/${id}`, {
       ...payload.params,
     })
@@ -29,6 +27,16 @@ const cakeFaceApi = {
 
   deleteById: (id: string) => {
     return jsonAxios.delete<AxiosResponseData>(`/cake-face/${id}`)
+  },
+
+  deleteConfigFile: (id: string, index: string) => {
+    return jsonAxios.put<AxiosResponseData>(`/cake-face/${id}/config/${index}`)
+  },
+
+  addConfigFiles: (id: string, newFiles: File[]) => {
+    return formDataAxios.put<AxiosResponseData>(`/cake-face/${id}/config`, {
+      configFile: [...newFiles],
+    })
   },
 }
 export default cakeFaceApi

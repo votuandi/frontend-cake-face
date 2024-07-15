@@ -27,6 +27,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/store/rootReducer'
 import { getCurrentUserInfo } from '@/store/user/user.action'
+import Cookies from 'universal-cookie'
 
 interface LoginFormValues {
   username: string
@@ -48,6 +49,7 @@ export default function Contact() {
   const locale = i18n.language
   const dispatch = useDispatch()
   const { currentUserInfo } = useSelector((state: RootState) => state.user)
+  const cookies = new Cookies()
 
   const formik = useFormik({
     initialValues: DEFAULT_INITIAL_VALUE,
@@ -67,7 +69,12 @@ export default function Contact() {
           setCookie(COOKIE_USER_ROLE, loginData.user.role, { maxAge: MAX_AGE })
           setCookie(COOKIE_ACCESS_TOKEN, loginData.accessToken, { maxAge: MAX_AGE })
           setCookie(COOKIE_REFRESH_TOKEN, loginData.refreshToken, { maxAge: MAX_AGE })
-          gotoPage('/')
+
+          console.log('loginData', loginData)
+          const accessToken = cookies.get(COOKIE_ACCESS_TOKEN)
+          console.log(accessToken)
+
+          // gotoPage('/')
         }
         setSubmitting(false)
       } catch (error) {
@@ -85,6 +92,11 @@ export default function Contact() {
 
   useEffect(() => {
     if (currentUserInfo) {
+      setCookie(COOKIE_USERNAME, currentUserInfo.userName, { maxAge: MAX_AGE })
+      setCookie(COOKIE_USER_NAME, currentUserInfo.name, { maxAge: MAX_AGE })
+      setCookie(COOKIE_AVATAR, currentUserInfo.avatar, { maxAge: MAX_AGE })
+      setCookie(COOKIE_USER_ID, currentUserInfo.id, { maxAge: MAX_AGE })
+      setCookie(COOKIE_USER_ROLE, currentUserInfo.role, { maxAge: MAX_AGE })
       alert(`Chào ${currentUserInfo.name}!\nBạn đã đăng nhập trước đó!`)
       gotoPage('/')
     }

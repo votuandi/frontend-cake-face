@@ -17,6 +17,14 @@ export const ADMIN_MENU = [
     path: '/cake-face',
   },
   {
+    title: 'Trendy',
+    path: '/trendy',
+  },
+  {
+    title: 'Store',
+    path: '/store',
+  },
+  {
     title: 'Account',
     path: '/account',
   },

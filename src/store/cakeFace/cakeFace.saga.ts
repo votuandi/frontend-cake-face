@@ -1,6 +1,6 @@
 import { all, call, put, select, takeEvery, takeLatest } from 'redux-saga/effects'
 import axios from 'axios'
-import { CakeFaceActionTypes, GetCakeFaceDetailAction, GetCakeFaceListAction, GetCakeFaceListSuccessAction } from './cakeFace.types'
+import { CakeFaceActionTypes, GetCakeFaceDetailAction, GetCakeFaceListAction, GetCakeFaceListSuccessAction, GetTrendyCakeFaceListAction } from './cakeFace.types'
 import {
   getCakeFaceDetailFailure,
   getCakeFaceDetailRequested,
@@ -8,6 +8,9 @@ import {
   getCakeFaceListFailure,
   getCakeFaceListRequested,
   getCakeFaceListSuccess,
+  getTrendyCakeFaceListFailure,
+  getTrendyCakeFaceListRequested,
+  getTrendyCakeFaceListSuccess,
 } from './cakeFace.action'
 import { cakeFaceApi } from '@/utils/api'
 
@@ -37,6 +40,22 @@ function* getCakeFaceList(action: GetCakeFaceListAction) {
   }
 }
 
+function* getTrendyCakeFaceList(action: GetTrendyCakeFaceListAction) {
+  yield put(getTrendyCakeFaceListRequested())
+  try {
+    const { data: response }: Awaited<ReturnType<typeof cakeFaceApi.getList>> = yield call(cakeFaceApi.getList, action.payload)
+    if (response.status) {
+      yield put(getTrendyCakeFaceListSuccess(response.params.data ?? []))
+    } else {
+      yield put(getTrendyCakeFaceListFailure(response.message))
+    }
+  } catch (error) {
+    if (axios.isCancel(error)) return
+    const message = axios.isAxiosError(error) ? (error.response?.data as any)?.message || error.message : ''
+    yield put(getTrendyCakeFaceListFailure(message))
+  }
+}
+
 function* getCakeFaceDetail(action: GetCakeFaceDetailAction) {
   yield put(getCakeFaceDetailRequested())
   try {
@@ -54,5 +73,9 @@ function* getCakeFaceDetail(action: GetCakeFaceDetailAction) {
 }
 
 export default function* cakeFaceSaga() {
-  yield all([takeEvery(CakeFaceActionTypes.GET_CAKE_FACE_LIST, getCakeFaceList), takeEvery(CakeFaceActionTypes.GET_CAKE_FACE_DETAIL, getCakeFaceDetail)])
+  yield all([
+    takeEvery(CakeFaceActionTypes.GET_CAKE_FACE_LIST, getCakeFaceList),
+    takeEvery(CakeFaceActionTypes.GET_CAKE_FACE_DETAIL, getCakeFaceDetail),
+    takeEvery(CakeFaceActionTypes.GET_TRENDY_CAKE_FACE_LIST, getTrendyCakeFaceList),
+  ])
 }

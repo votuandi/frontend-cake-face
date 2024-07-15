@@ -27,6 +27,8 @@ formDataAxios.interceptors.request.use(
       }
       case 'POST': {
         if (!(req.data instanceof FormData) && !!req.data) {
+          console.log('req.data', req.data)
+
           req.data = commonHelpers.formatFormData(req.data)
         }
 

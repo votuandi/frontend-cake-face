@@ -7,8 +7,8 @@ import { COOKIE_ACCESS_TOKEN, COOKIE_REFRESH_TOKEN, COOKIE_USER_ROLE } from '@/u
 const PUBLIC_PAGES = ['/', '/sign-in']
 
 const rolePermissions: Record<Role, string[]> = {
-  admin: ['/admin', ...PUBLIC_PAGES], // admin can access all pages
-  client: [...PUBLIC_PAGES],
+  admin: ['/admin', ...PUBLIC_PAGES, '/account'], // admin can access all pages
+  client: [...PUBLIC_PAGES, '/account'],
   user: [...PUBLIC_PAGES],
 }
 
@@ -17,6 +17,8 @@ const isPathAccessible = (role: Role, path: string): boolean => {
   if (role === 'admin' && path.startsWith('/admin')) {
     return true
   }
+
+  if (path.startsWith('/cake-face/')) return true
 
   const accessiblePaths = rolePermissions[role] || []
   return accessiblePaths.includes(path)
@@ -34,6 +36,8 @@ const useAuth = () => {
     if (!accessToken || !refreshToken || !userRole) {
       // No tokens, user is not logged in
       if (!PUBLIC_PAGES.includes(router.pathname)) {
+        console.log(1)
+
         if (confirm('Bạn không có quyền truy cập trang này. Vui lòng đăng nhập!')) router.push('/sign-in')
         else router.push('/')
       }
@@ -44,6 +48,7 @@ const useAuth = () => {
       const role: Role = userRole
 
       if (!isPathAccessible(role, router.pathname)) {
+        console.log(2)
         // Redirect to home page if user tries to access unauthorized page
         alert('Bạn không có quyền truy cập trang này!')
         router.push('/')

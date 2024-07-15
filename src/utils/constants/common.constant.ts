@@ -51,3 +51,14 @@ export const QUILL_FORMAT = [
   'align',
   'background', // add this line for text color
 ]
+
+export type SORT_BY_TYPE = 'name' | 'createDate' | 'viewAmount' | 'downloadAmount' | 'isTrendy'
+
+export const CAKE_FACE_SORT_LIST: Array<{ title: string; value: SORT_BY_TYPE }> = [
+  { title: 'Theo tên', value: 'name' },
+  { title: 'Mới nhất', value: 'createDate' },
+  { title: 'Lượt xem', value: 'viewAmount' },
+  { title: 'Lượt tải', value: 'downloadAmount' },
+]
+
+export type ROLE_TYPE = 'admin' | 'client' | 'user'

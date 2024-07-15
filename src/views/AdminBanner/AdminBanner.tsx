@@ -9,14 +9,14 @@ import { Box, Button, CircularProgress, Grid, Tab, Tabs, Typography } from '@mui
 import AppBanner from '@/components/AppBanner'
 import AppAdminMenu from '@/components/AppAdminMenu'
 import Head from 'next/head'
-import { BANNER_ITEM_TYPE } from '@/utils/api/banner'
-import { bannerApi } from '@/utils/api'
-import { useDispatch } from 'react-redux'
-import { setIsShowLoading } from '@/slices/showSlice'
+import { useDispatch, useSelector } from 'react-redux'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import { RootState } from '@/store/rootReducer'
+import { getBanners } from '@/store/banner/banner.action'
+import { bannerApi } from '@/utils/api'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -45,71 +45,52 @@ export default function AdminBanner() {
   const { t, i18n } = useTranslation()
   const locale = i18n.language
   const dispatch = useDispatch()
+  const { banners } = useSelector((state: RootState) => state.banner)
 
-  const [tabIndex, setTabIndex] = useState<number>(0)
-  const [bannerList, setBannerList] = useState<BANNER_ITEM_TYPE[]>([])
   const [isLongerRatio, setIsLongerRatio] = useState<boolean>(false)
-
-  const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
-    setTabIndex(newValue)
-  }
+  const [isShowLoading, setIsShowLoading] = useState<boolean>(false)
 
   let GetBannerList = async () => {
     try {
-      dispatch(setIsShowLoading(true))
-      let res = await bannerApi.getByDevice(tabIndex === 0 ? 'pc' : 'mobile')
-      if (res.data.status) {
-        setBannerList(res.data.params)
-      }
-      dispatch(setIsShowLoading(false))
+      dispatch(getBanners())
     } catch (error) {
-      dispatch(setIsShowLoading(false))
       console.log(error)
     }
   }
 
   let DeleteBanner = async (id: string) => {
     try {
-      dispatch(setIsShowLoading(true))
-      let res = await bannerApi.deleteById(id)
+      setIsShowLoading(true)
+      let res = await bannerApi.deleteBanner(id)
       if (res.data.status) {
         GetBannerList()
       } else {
         alert('Xóa ảnh thất bại. Vui lòng thử lại!')
-        dispatch(setIsShowLoading(false))
+        setIsShowLoading(false)
       }
     } catch (error) {
-      dispatch(setIsShowLoading(false))
+      setIsShowLoading(false)
       console.log(error)
     }
   }
 
   let UpdateBanner = async (id: string, action: 'up' | 'down') => {
     try {
-      dispatch(setIsShowLoading(true))
-      let res = await bannerApi.updateBanner(id, {
-        params: {
-          action: action,
-        },
-      })
-      if (res.data.status) {
-        setBannerList(res.data.params)
+      setIsShowLoading(true)
+      let res = await bannerApi.update(id, action)
+      if (res.status === 200) {
+        GetBannerList()
+        setIsShowLoading(false)
       }
-      dispatch(setIsShowLoading(false))
     } catch (error) {
-      dispatch(setIsShowLoading(false))
+      setIsShowLoading(false)
       console.log(error)
     }
   }
 
   let AddNewBanner = async (image: File) => {
     try {
-      let res = await bannerApi.createBanner({
-        params: {
-          device: tabIndex === 0 ? 'pc' : 'mobile',
-          image: image,
-        },
-      })
+      let res = await bannerApi.addBanner(image)
       if (res.data.status) {
         return true
       } else return false
@@ -121,7 +102,7 @@ export default function AdminBanner() {
 
   const handleAddFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      dispatch(setIsShowLoading(true))
+      setIsShowLoading(true)
       const selectedFiles = e.target.files
       let amountSuccess = 0
       for (let i = 0; i < selectedFiles.length; i++) {
@@ -130,7 +111,7 @@ export default function AdminBanner() {
         if (res) amountSuccess += 1
         else amountSuccess -= 1
       }
-      dispatch(setIsShowLoading(false))
+      setIsShowLoading(false)
       alert(`Đã thêm ${amountSuccess}/${selectedFiles.length} ảnh vào danh sách banner.`)
       await GetBannerList()
     }
@@ -149,10 +130,6 @@ export default function AdminBanner() {
     if (!isMounted()) return
     FetchData()
   }, [locale])
-
-  useEffect(() => {
-    GetBannerList()
-  }, [tabIndex])
 
   const { classes } = useStyles({ params: {} })
   let isMounted = useIsMounted()
@@ -173,7 +150,7 @@ export default function AdminBanner() {
               padding: '24px',
               overflow: 'auto',
               backgroundColor: '#f4f0ed',
-              fontFamily: 'Mulish',
+              fontFamily: 'Open Sans',
             }}
           >
             <Typography
@@ -181,332 +158,123 @@ export default function AdminBanner() {
               sx={{
                 fontWeight: 900,
                 fontSize: '36px',
-                color: '#62000D',
+                color: '#26787c',
               }}
             >
               Chỉnh sửa Banner
             </Typography>
-            <Box sx={{ width: '100%' }}>
-              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Tabs
-                  value={tabIndex}
-                  onChange={handleChangeTab}
-                  aria-label="basic tabs example"
-                  sx={{
-                    color: '#62000D',
-                  }}
-                >
-                  <Tab label="Bản PC" {...a11yProps(0)} />
-                  <Tab label="Bản Mobile" {...a11yProps(1)} />
-                </Tabs>
-              </Box>
-              <CustomTabPanel value={tabIndex} index={0}>
-                <Box
-                  sx={{
-                    width: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'start',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      ml: 'auto',
-                      mb: '12px',
-                    }}
-                  >
-                    <Button
-                      variant={isLongerRatio ? 'outlined' : 'contained'}
+            <Box
+              sx={{
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'start',
+              }}
+            >
+              <Grid container>
+                {banners.map((banner, index) => (
+                  <Grid item key={index} xs={12} sm={6} lg={4} padding="8px">
+                    <Box
                       sx={{
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '8px',
+                        backgroundColor: '#26787c20',
                         borderRadius: '8px',
-                        borderTopRightRadius: 0,
-                        borderBottomRightRadius: 0,
+                        boxShadow: 1,
                       }}
-                      onClick={() => setIsLongerRatio(false)}
                     >
-                      4:3
-                    </Button>
-                    <Button
-                      variant={isLongerRatio ? 'contained' : 'outlined'}
-                      sx={{
-                        borderRadius: '8px',
-                        borderTopLeftRadius: 0,
-                        borderBottomLeftRadius: 0,
-                      }}
-                      onClick={() => setIsLongerRatio(true)}
-                    >
-                      16:9
-                    </Button>
-                  </Box>
-                  <Grid container>
-                    {bannerList.map((banner, index) => (
-                      <Grid item key={index} xs={12} sm={6} lg={4} padding="8px">
-                        <Box
-                          sx={{
-                            width: '100%',
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            padding: '8px',
-                            backgroundColor: '#D0030020',
-                            borderRadius: '8px',
-                            boxShadow: 1,
-                          }}
-                        >
-                          <Box
-                            sx={{
-                              width: '100%',
-                              borderRadius: '8px',
-                              backgroundImage: `url(${banner.path.includes('\\') ? banner.path.replaceAll('\\', '/') : banner.path})`,
-                              aspectRatio: isLongerRatio ? 16 / 9 : 4 / 3,
-                              backgroundRepeat: 'no-repeat',
-                              backgroundPosition: 'center',
-                              backgroundSize: 'cover',
-                              boxShadow: 3,
-                            }}
-                          ></Box>
-                          <Grid container spacing="8px" sx={{ mt: '8px' }}>
-                            <Grid item xs={4}>
-                              <Box sx={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'end' }}>
-                                <Button
-                                  color="secondary"
-                                  variant="contained"
-                                  disabled={index === 0}
-                                  sx={{
-                                    borderRadius: '8px',
-                                  }}
-                                  onClick={() => UpdateBanner(banner.id, 'up')}
-                                >
-                                  <ArrowBackIcon sx={{ color: index === 0 ? '#452424' : '#8E0000' }} />
-                                </Button>
-                              </Box>
-                            </Grid>
-                            <Grid item xs={4}>
-                              <Box sx={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'cneter' }}>
-                                <Button color="primary" variant="contained" sx={{ borderRadius: '8px', mx: 'auto' }} onClick={() => DeleteBanner(banner.id)}>
-                                  <DeleteOutlineIcon sx={{ color: '#fff' }} />
-                                </Button>
-                              </Box>
-                            </Grid>
-                            <Grid item xs={4}>
-                              <Box sx={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'end' }}>
-                                <Button
-                                  color="secondary"
-                                  variant="contained"
-                                  disabled={index === bannerList.length - 1}
-                                  sx={{
-                                    borderRadius: '8px',
-                                    mr: 'auto',
-                                  }}
-                                  onClick={() => UpdateBanner(banner.id, 'down')}
-                                >
-                                  <ArrowForwardIcon sx={{ color: index === bannerList.length - 1 ? '#452424' : '#8E0000' }} />
-                                </Button>
-                              </Box>
-                            </Grid>
-                          </Grid>
-                        </Box>
-                      </Grid>
-                    ))}
-                    <Grid item xs={12} sm={6} lg={4} padding="8px">
                       <Box
                         sx={{
                           width: '100%',
-                          height: '100%',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          padding: '8px',
-                          backgroundColor: '#D0030020',
                           borderRadius: '8px',
-                          // boxShadow: 1,
+                          backgroundImage: `url(${banner.path.includes('\\') ? banner.path.replaceAll('\\', '/') : banner.path})`,
+                          aspectRatio: isLongerRatio ? 16 / 9 : 4 / 3,
+                          backgroundRepeat: 'no-repeat',
+                          backgroundPosition: 'center',
+                          backgroundSize: 'cover',
+                          boxShadow: 3,
                         }}
-                      >
-                        <input type="file" accept="image/*" multiple onChange={handleAddFiles} style={{ display: 'none' }} id="upload-image" />
-                        <label htmlFor="upload-image">
-                          <Button
-                            color="primary"
-                            variant="contained"
-                            sx={{
-                              borderRadius: '8px',
-                            }}
-                            startIcon={<AddCircleOutlineIcon />}
-                            component="span"
-                          >
-                            Thêm ảnh
-                          </Button>
-                        </label>
-                      </Box>
-                    </Grid>
+                      ></Box>
+                      <Grid container spacing="8px" sx={{ mt: '8px' }}>
+                        <Grid item xs={4}>
+                          <Box sx={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'end' }}>
+                            <Button
+                              color="secondary"
+                              variant="contained"
+                              disabled={index === 0}
+                              sx={{
+                                borderRadius: '8px',
+                              }}
+                              onClick={() => UpdateBanner(banner.id.toString(), 'up')}
+                            >
+                              <ArrowBackIcon sx={{ color: index === 0 ? '#26787c' : '#4ac2c7' }} />
+                            </Button>
+                          </Box>
+                        </Grid>
+                        <Grid item xs={4}>
+                          <Box sx={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'cneter' }}>
+                            <Button color="primary" variant="contained" sx={{ borderRadius: '8px', mx: 'auto' }} onClick={() => DeleteBanner(banner.id.toString())}>
+                              <DeleteOutlineIcon sx={{ color: '#fff' }} />
+                            </Button>
+                          </Box>
+                        </Grid>
+                        <Grid item xs={4}>
+                          <Box sx={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'end' }}>
+                            <Button
+                              color="secondary"
+                              variant="contained"
+                              disabled={index === banners.length - 1}
+                              sx={{
+                                borderRadius: '8px',
+                                mr: 'auto',
+                              }}
+                              onClick={() => UpdateBanner(banner.id.toString(), 'down')}
+                            >
+                              <ArrowForwardIcon sx={{ color: index === banners.length - 1 ? '#26787c' : '#4ac2c7' }} />
+                            </Button>
+                          </Box>
+                        </Grid>
+                      </Grid>
+                    </Box>
                   </Grid>
-                </Box>
-              </CustomTabPanel>
-              <CustomTabPanel value={tabIndex} index={1}>
-                <Box
-                  sx={{
-                    width: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'start',
-                  }}
-                >
+                ))}
+                <Grid item xs={12} sm={6} lg={4} padding="8px">
                   <Box
                     sx={{
+                      width: '100%',
+                      height: '100%',
                       display: 'flex',
-                      flexDirection: 'row',
+                      flexDirection: 'column',
                       justifyContent: 'center',
                       alignItems: 'center',
-                      ml: 'auto',
-                      mb: '12px',
+                      padding: '8px',
+                      backgroundColor: '#26787c20',
+                      borderRadius: '8px',
+                      // boxShadow: 1,
                     }}
                   >
-                    <Button
-                      variant={isLongerRatio ? 'outlined' : 'contained'}
-                      sx={{
-                        borderRadius: '8px',
-                        borderTopRightRadius: 0,
-                        borderBottomRightRadius: 0,
-                      }}
-                      onClick={() => setIsLongerRatio(false)}
-                    >
-                      3:4
-                    </Button>
-                    <Button
-                      variant={isLongerRatio ? 'contained' : 'outlined'}
-                      sx={{
-                        borderRadius: '8px',
-                        borderTopLeftRadius: 0,
-                        borderBottomLeftRadius: 0,
-                      }}
-                      onClick={() => setIsLongerRatio(true)}
-                    >
-                      9:16
-                    </Button>
-                  </Box>
-                  <Grid container>
-                    {bannerList.map((banner, index) => (
-                      <Grid item key={index} xs={12} sm={6} md={4} lg={3} padding="8px">
-                        <Box
-                          sx={{
-                            width: '100%',
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            padding: '8px',
-                            backgroundColor: '#D0030020',
-                            borderRadius: '8px',
-
-                            '& img': {
-                              width: '100%',
-                              borderRadius: '8px',
-                            },
-                          }}
-                        >
-                          <Box
-                            sx={{
-                              width: '100%',
-                              borderRadius: '8px',
-                              backgroundImage: `url(${banner.path.includes('\\') ? banner.path.replaceAll('\\', '/') : banner.path})`,
-                              aspectRatio: isLongerRatio ? 9 / 16 : 3 / 4,
-                              backgroundRepeat: 'no-repeat',
-                              backgroundPosition: 'center',
-                              backgroundSize: 'cover',
-                            }}
-                          ></Box>
-                          <Grid container spacing="8px" sx={{ mt: '8px' }}>
-                            <Grid item xs={4}>
-                              <Box sx={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'end' }}>
-                                <Button
-                                  color="secondary"
-                                  variant="contained"
-                                  disabled={index === 0}
-                                  sx={{
-                                    borderRadius: '8px',
-                                  }}
-                                  onClick={() => UpdateBanner(banner.id, 'up')}
-                                >
-                                  <ArrowBackIcon sx={{ color: index === 0 ? '#452424' : '#8E0000' }} />
-                                </Button>
-                              </Box>
-                            </Grid>
-                            <Grid item xs={4}>
-                              <Box sx={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'cneter' }}>
-                                <Button
-                                  color="primary"
-                                  variant="contained"
-                                  sx={{
-                                    borderRadius: '8px',
-                                    mx: 'auto',
-                                  }}
-                                  onClick={() => DeleteBanner(banner.id)}
-                                >
-                                  <DeleteOutlineIcon sx={{ color: '#fff' }} />
-                                </Button>
-                              </Box>
-                            </Grid>
-                            <Grid item xs={4}>
-                              <Box sx={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'end' }}>
-                                <Button
-                                  color="secondary"
-                                  variant="contained"
-                                  disabled={index === bannerList.length - 1}
-                                  sx={{
-                                    borderRadius: '8px',
-                                    mr: 'auto',
-                                  }}
-                                  onClick={() => UpdateBanner(banner.id, 'down')}
-                                >
-                                  <ArrowForwardIcon sx={{ color: index === bannerList.length - 1 ? '#452424' : '#8E0000' }} />
-                                </Button>
-                              </Box>
-                            </Grid>
-                          </Grid>
-                        </Box>
-                      </Grid>
-                    ))}
-                    <Grid item xs={12} sm={6} md={4} lg={3} padding="8px">
-                      <Box
+                    <input type="file" accept="image/*" multiple onChange={handleAddFiles} style={{ display: 'none' }} id="upload-image" />
+                    <label htmlFor="upload-image">
+                      <Button
+                        color="primary"
+                        variant="contained"
                         sx={{
-                          width: '100%',
-                          height: '100%',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          padding: '8px',
-                          backgroundColor: '#D0030020',
                           borderRadius: '8px',
-                          // boxShadow: 1,
                         }}
+                        startIcon={<AddCircleOutlineIcon />}
+                        component="span"
                       >
-                        <input type="file" accept="image/*" multiple onChange={handleAddFiles} style={{ display: 'none' }} id="upload-image" />
-                        <label htmlFor="upload-image">
-                          <Button
-                            color="primary"
-                            variant="contained"
-                            sx={{
-                              borderRadius: '8px',
-                            }}
-                            startIcon={<AddCircleOutlineIcon />}
-                            component="span"
-                          >
-                            Thêm ảnh
-                          </Button>
-                        </label>
-                      </Box>
-                    </Grid>
-                  </Grid>
-                </Box>
-              </CustomTabPanel>
+                        Thêm ảnh
+                      </Button>
+                    </label>
+                  </Box>
+                </Grid>
+              </Grid>
             </Box>
           </Box>
         </>

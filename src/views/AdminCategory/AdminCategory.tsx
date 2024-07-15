@@ -8,6 +8,7 @@ import {
   Box,
   Button,
   CircularProgress,
+  Container,
   Dialog,
   DialogActions,
   DialogContent,
@@ -16,6 +17,7 @@ import {
   FormControl,
   FormLabel,
   Grid,
+  Pagination,
   Switch,
   TextField,
   Typography,
@@ -59,6 +61,9 @@ export default function AdminCategory() {
   const [newThumbnailPreview, setNewThumbnailPreview] = useState<string | null>(null)
   const [updateFile, setUpdateFile] = useState<File | null>(null)
   const [updateThumbnailPreview, setUpdateThumbnailPreview] = useState<string | null>(null)
+  const [limit, setLimit] = useState<number>(10)
+  const [page, setPage] = useState<number>(1)
+  const [search, setSearch] = useState<string>('')
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -112,7 +117,7 @@ export default function AdminCategory() {
   }
 
   let GetCategoryList = async () => {
-    dispatch(getCategoryList({ params: {} }))
+    dispatch(getCategoryList({ params: { limit, page, name: search } }))
   }
 
   let CreateNewCategory = async () => {
@@ -224,6 +229,10 @@ export default function AdminCategory() {
     FetchData()
   }, [locale])
 
+  useEffect(() => {
+    GetCategoryList()
+  }, [page, search])
+
   const { classes } = useStyles({ params: {} })
   let isMounted = useIsMounted()
 
@@ -249,54 +258,29 @@ export default function AdminCategory() {
             fontFamily: 'Open Sans',
           }}
         >
-          {isShowMenu && isSmallScreenMenu && (
-            <Box
-              sx={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                zIndex: 99,
-              }}
-              ref={menuRef}
-            >
-              <AppAdminMenu />
-            </Box>
-          )}
-          <Box
+          <Container
+            maxWidth="lg"
             sx={{
-              width: '100%',
               display: 'flex',
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              gap: '16px',
-              justifyContent: 'space-between',
-              alignItems: 'baseline',
+              flexDirection: 'column',
+              backgroundColor: '#fff',
+              boxShadow: 2,
+              padding: '24px 24px 40px 24px',
+              borderRadius: '8px',
+              gap: '20px',
             }}
           >
             <Box
               sx={{
+                width: '100%',
                 display: 'flex',
                 flexDirection: 'row',
-                justifyContent: 'center',
+                flexWrap: 'wrap',
+                gap: '16px',
+                justifyContent: 'space-between',
                 alignItems: 'baseline',
-                gap: '8px',
               }}
             >
-              {isSmallScreenMenu && (
-                <Button
-                  sx={{
-                    backgroundColor: '#26787c',
-                    padding: '12px ',
-                    fontWeight: 600,
-                    fontSize: '16px',
-                    color: '#fff',
-                    '&:hover': { backgroundColor: '#7C310A' },
-                  }}
-                  onClick={() => setIsShowMenu((x) => !x)}
-                >
-                  <MenuIcon sx={{ color: '#fff' }} />
-                </Button>
-              )}
               <Typography
                 variant="headerSemi35"
                 sx={{
@@ -307,462 +291,467 @@ export default function AdminCategory() {
               >
                 Quản Lý Danh mục
               </Typography>
-            </Box>
-
-            <Button
-              startIcon={<AddCircleOutlineIcon sx={{ color: '#fff' }} />}
-              sx={{
-                backgroundColor: '#26787c',
-                padding: '12px ',
-                fontWeight: 600,
-                fontSize: '16px',
-                color: '#fff',
-                '&:hover': { backgroundColor: '#6abcb6' },
-              }}
-              onClick={handleNewEvent}
-            >
-              Thêm mới
-            </Button>
-          </Box>
-          {isShowNewPopup && (
-            <Box
-              sx={{
-                width: '100%',
-                maxWidth: '640px',
-                // border: '1px solid #0596A660',
-                borderRadius: '8px',
-                margin: '-24px 0 0 auto',
-                padding: '12px 18px',
-                boxShadow: 2,
-                gap: '16px',
-                display: 'flex',
-                flexDirection: 'column',
-                backgroundColor: '#0596A610',
-              }}
-            >
-              <Typography
+              <Button
+                startIcon={<AddCircleOutlineIcon sx={{ color: '#fff' }} />}
                 sx={{
-                  fontSize: '18px',
-                  fontWeight: 700,
-                  color: '#0596A6',
+                  backgroundColor: '#26787c',
+                  padding: '12px ',
+                  fontWeight: 600,
+                  fontSize: '16px',
+                  color: '#fff',
+                  '&:hover': { backgroundColor: '#6abcb6' },
                 }}
+                onClick={handleNewEvent}
               >
-                Tạo danh mục mới
-              </Typography>
-              <TextField
-                id="new-name"
-                label="Tên danh mục"
-                variant="outlined"
-                fullWidth
+                Thêm mới
+              </Button>
+            </Box>
+            {isShowNewPopup && (
+              <Box
                 sx={{
-                  backgroundColor: '#fff',
-                  borderRadius: '12px',
-
-                  '& fieldset': {
-                    borderColor: '#0596A6',
-                    // backgroundColor: '#fff',
-                  },
-
-                  '& .MuiFormLabel-root': {
-                    color: '#0596A6',
-                  },
-                }}
-                value={newName}
-                onChange={(e: any) => setNewName(e.target.value)}
-              />
-              <TextField
-                id="new-name"
-                label="Thêm chi tiết"
-                variant="outlined"
-                fullWidth
-                multiline
-                rows="2"
-                sx={{
-                  backgroundColor: '#fff',
-                  borderRadius: '12px',
-
-                  '& fieldset': {
-                    borderColor: '#0596A6',
-                    // backgroundColor: '#fff',
-                  },
-
-                  '& .MuiFormLabel-root': {
-                    color: '#0596A6',
-                  },
-                }}
-                value={newDetail}
-                onChange={(e: any) => setNewDetail(e.target.value)}
-              />
-              <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} id="upload-image" />
-              <label htmlFor="upload-image">
-                <Button variant="contained" component="span">
-                  Chọn ảnh đại diện
-                </Button>
-              </label>
-              {newThumbnailPreview && <img src={newThumbnailPreview} alt="Selected" style={{ marginTop: '10px', maxWidth: '100%' }} />}
-              {newFile && <Typography sx={{ color: '#1a1a1a' }}>{newFile.name}</Typography>}
-              <FormControl
-                sx={{
+                  width: '100%',
+                  maxWidth: '640px',
+                  // border: '1px solid #0596A660',
+                  borderRadius: '8px',
+                  margin: '-24px 0 0 auto',
+                  padding: '12px 18px',
+                  boxShadow: 2,
+                  gap: '16px',
                   display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  color: '#0596A6',
+                  flexDirection: 'column',
+                  backgroundColor: '#0596A610',
                 }}
               >
-                <FormLabel>Kích hoạt</FormLabel>
-                <Switch checked={newActive} onClick={() => setNewActive((x) => !x)}></Switch>
-              </FormControl>
+                <Typography
+                  sx={{
+                    fontSize: '18px',
+                    fontWeight: 700,
+                    color: '#0596A6',
+                  }}
+                >
+                  Tạo danh mục mới
+                </Typography>
+                <TextField
+                  id="new-name"
+                  label="Tên danh mục"
+                  variant="outlined"
+                  fullWidth
+                  sx={{
+                    backgroundColor: '#fff',
+                    borderRadius: '12px',
 
-              <Box sx={{ display: 'flex', flexDirection: 'row', gap: '8px', marginLeft: 'auto' }}>
-                <Button
-                  variant="contained"
-                  onClick={CreateNewCategory}
-                  startIcon={<CheckCircleIcon sx={{ width: '16px', height: '16px' }} />}
-                  sx={{ fontSize: '16', fontWeight: 600, backgroundColor: '#28BFDF  ', '&:hover': { backgroundColor: '#28BFDF ' } }}
+                    '& fieldset': {
+                      borderColor: '#0596A6',
+                      // backgroundColor: '#fff',
+                    },
+
+                    '& .MuiFormLabel-root': {
+                      color: '#0596A6',
+                    },
+                  }}
+                  value={newName}
+                  onChange={(e: any) => setNewName(e.target.value)}
+                />
+                <TextField
+                  id="new-name"
+                  label="Thêm chi tiết"
+                  variant="outlined"
+                  fullWidth
+                  multiline
+                  rows="2"
+                  sx={{
+                    backgroundColor: '#fff',
+                    borderRadius: '12px',
+
+                    '& fieldset': {
+                      borderColor: '#0596A6',
+                      // backgroundColor: '#fff',
+                    },
+
+                    '& .MuiFormLabel-root': {
+                      color: '#0596A6',
+                    },
+                  }}
+                  value={newDetail}
+                  onChange={(e: any) => setNewDetail(e.target.value)}
+                />
+                <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} id="upload-image" />
+                <label htmlFor="upload-image">
+                  <Button variant="contained" component="span">
+                    Chọn ảnh đại diện
+                  </Button>
+                </label>
+                {newThumbnailPreview && <img src={newThumbnailPreview} alt="Selected" style={{ marginTop: '10px', maxWidth: '100%' }} />}
+                {newFile && <Typography sx={{ color: '#1a1a1a' }}>{newFile.name}</Typography>}
+                <FormControl
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    color: '#0596A6',
+                  }}
                 >
-                  OK
-                </Button>
-                <Button
-                  onClick={() => setIsShowNewPopup(false)}
-                  variant="contained"
-                  color="warning"
-                  startIcon={<CancelIcon sx={{ width: '16px', height: '16px' }} />}
-                  sx={{ fontSize: '16', fontWeight: 600 }}
-                >
-                  Cancel
-                </Button>
+                  <FormLabel>Kích hoạt</FormLabel>
+                  <Switch checked={newActive} onClick={() => setNewActive((x) => !x)}></Switch>
+                </FormControl>
+
+                <Box sx={{ display: 'flex', flexDirection: 'row', gap: '8px', marginLeft: 'auto' }}>
+                  <Button
+                    variant="contained"
+                    onClick={CreateNewCategory}
+                    startIcon={<CheckCircleIcon sx={{ width: '16px', height: '16px' }} />}
+                    sx={{ fontSize: '16', fontWeight: 600, backgroundColor: '#28BFDF  ', '&:hover': { backgroundColor: '#28BFDF ' } }}
+                  >
+                    OK
+                  </Button>
+                  <Button
+                    onClick={() => setIsShowNewPopup(false)}
+                    variant="contained"
+                    color="warning"
+                    startIcon={<CancelIcon sx={{ width: '16px', height: '16px' }} />}
+                    sx={{ fontSize: '16', fontWeight: 600 }}
+                  >
+                    Cancel
+                  </Button>
+                </Box>
               </Box>
-            </Box>
-          )}
-          <Box sx={{ width: '99%', mx: 'auto' }}>
-            <Grid
-              container
-              sx={{
-                width: '100%',
-              }}
-            >
+            )}
+            <TextField
+              sx={{ width: '300px', backgroundColor: '#fff', borderRadius: '4px', '& fieldset': { borderRadius: '4px' }, '& input': { padding: '4px 10px' } }}
+              placeholder="Nhận để tìm kiếm"
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <Box sx={{ width: '99%', mx: 'auto' }}>
               <Grid
-                item
-                xs={1}
-                sx={{
-                  textAlign: 'center',
-                  color: '#fff',
-                  fontWeight: 600,
-                  fontSize: '16px',
-                  border: '1px solid #26787c',
-                  padding: '12px 6px',
-                  borderTopLeftRadius: '12px',
-                  backgroundColor: '#26787c',
-                }}
-              >
-                STT
-              </Grid>
-              <Grid
-                item
-                xs={2}
-                sx={{
-                  textAlign: 'center',
-                  color: '#fff',
-                  fontWeight: 600,
-                  fontSize: '16px',
-                  borderTop: '1px solid #26787c',
-                  borderBottom: '1px solid #26787c',
-                  padding: '12px 6px',
-                  backgroundColor: '#26787c',
-                }}
-              >
-                Tên danh mục
-              </Grid>
-              <Grid
-                item
-                xs={3}
-                sx={{
-                  textAlign: 'center',
-                  color: '#fff',
-                  fontWeight: 600,
-                  fontSize: '16px',
-                  borderTop: '1px solid #26787c',
-                  borderBottom: '1px solid #26787c',
-                  padding: '12px 6px',
-                  backgroundColor: '#26787c',
-                }}
-              >
-                Chi tiết
-              </Grid>
-              <Grid
-                item
-                xs={3}
-                sx={{
-                  textAlign: 'center',
-                  color: '#fff',
-                  fontWeight: 600,
-                  fontSize: '16px',
-                  borderTop: '1px solid #26787c',
-                  borderBottom: '1px solid #26787c',
-                  padding: '12px 6px',
-                  backgroundColor: '#26787c',
-                }}
-              >
-                Ảnh đại diện
-              </Grid>
-              <Grid
-                item
-                xs={1}
-                sx={{
-                  textAlign: 'center',
-                  color: '#fff',
-                  fontWeight: 600,
-                  fontSize: '16px',
-                  borderTop: '1px solid #26787c',
-                  borderBottom: '1px solid #26787c',
-                  padding: '12px 6px',
-                  backgroundColor: '#26787c',
-                }}
-              >
-                Kích hoạt
-              </Grid>
-              <Grid
-                item
-                xs={2}
-                sx={{
-                  textAlign: 'center',
-                  color: '#fff',
-                  fontWeight: 600,
-                  fontSize: '16px',
-                  border: '1px solid #26787c',
-                  padding: '12px 6px',
-                  borderTopRightRadius: '12px',
-                  backgroundColor: '#26787c',
-                }}
-              >
-                Hành động
-              </Grid>
-            </Grid>
-            {categoryList.map((item, index) => (
-              <Grid
-                key={index}
                 container
                 sx={{
                   width: '100%',
-                  backgroundColor: index === editIndex ? '#26787c20' : '#fff',
-
-                  '& .MuiGrid-item': {
-                    display: 'flex',
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  },
                 }}
               >
                 <Grid
                   item
                   xs={1}
                   sx={{
-                    color: '#1a1a1a',
-                    fontSize: '16px',
-                    fontWeight: 400,
                     textAlign: 'center',
+                    color: '#fff',
+                    fontWeight: 600,
+                    fontSize: '16px',
                     border: '1px solid #26787c',
-                    borderTop: 'none',
                     padding: '12px 6px',
+                    borderTopLeftRadius: '12px',
+                    backgroundColor: '#26787c',
                   }}
                 >
-                  {index + 1}
+                  STT
                 </Grid>
                 <Grid
                   item
                   xs={2}
                   sx={{
-                    color: '#1a1a1a',
-                    fontSize: '16px',
+                    textAlign: 'center',
+                    color: '#fff',
                     fontWeight: 600,
-                    textAlign: 'left',
+                    fontSize: '16px',
+                    borderTop: '1px solid #26787c',
                     borderBottom: '1px solid #26787c',
-                    borderTop: 'none',
-                    padding: '12px 24px',
-                    justifyContent: 'start !important',
+                    padding: '12px 6px',
+                    backgroundColor: '#26787c',
                   }}
                 >
-                  {editIndex === index ? (
-                    <TextField
-                      sx={{
-                        backgroundColor: '#fff',
-                        borderRadius: '12px',
-
-                        '& fieldset': {
-                          borderColor: '#26787c',
-                        },
-
-                        '& .MuiFormLabel-root': {
-                          color: '#26787c',
-                        },
-                      }}
-                      fullWidth
-                      value={editName}
-                      onChange={(e: any) => setEditName(e.target.value)}
-                    ></TextField>
-                  ) : (
-                    <span>{item.name}</span>
-                  )}
+                  Tên danh mục
                 </Grid>
                 <Grid
                   item
                   xs={3}
                   sx={{
-                    color: '#1a1a1a',
-                    fontSize: '16px',
+                    textAlign: 'center',
+                    color: '#fff',
                     fontWeight: 600,
-                    textAlign: 'left',
+                    fontSize: '16px',
+                    borderTop: '1px solid #26787c',
                     borderBottom: '1px solid #26787c',
-                    borderTop: 'none',
-                    padding: '12px 24px',
-                    justifyContent: 'start !important',
+                    padding: '12px 6px',
+                    backgroundColor: '#26787c',
                   }}
                 >
-                  {editIndex === index ? (
-                    <TextField
-                      sx={{
-                        backgroundColor: '#fff',
-                        borderRadius: '12px',
-
-                        '& fieldset': {
-                          borderColor: '#26787c',
-                        },
-
-                        '& .MuiFormLabel-root': {
-                          color: '#26787c',
-                        },
-                      }}
-                      fullWidth
-                      value={editDetail}
-                      onChange={(e: any) => setEditDetail(e.target.value)}
-                    ></TextField>
-                  ) : (
-                    <span>{item.detail}</span>
-                  )}
+                  Chi tiết
                 </Grid>
                 <Grid
                   item
                   xs={3}
                   sx={{
-                    color: '#1a1a1a',
-                    fontSize: '16px',
+                    textAlign: 'center',
+                    color: '#fff',
                     fontWeight: 600,
-                    textAlign: 'left',
+                    fontSize: '16px',
+                    borderTop: '1px solid #26787c',
                     borderBottom: '1px solid #26787c',
-                    borderTop: 'none',
-                    padding: '12px 24px',
-
-                    '& img': {
-                      height: '120px',
-                      marginX: 'auto',
-                    },
+                    padding: '12px 6px',
+                    backgroundColor: '#26787c',
                   }}
                 >
-                  {editIndex === index ? (
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                      }}
-                    >
-                      <input type="file" accept="image/*" onChange={handleUpdateFileChange} style={{ display: 'none' }} id="upload-image" />
-                      <label htmlFor="upload-image">
-                        <Button sx={{ backgroundColor: '#26787c', borderRadius: '4px' }} variant="contained" component="span">
-                          Chọn ảnh khác
-                        </Button>
-                      </label>
-                      {updateThumbnailPreview && <img src={updateThumbnailPreview} alt="Selected" style={{ marginTop: '10px', width: '100%' }} />}
-                      {updateFile && <Typography sx={{ color: '#1a1a1a' }}>{updateFile.name}</Typography>}
-                    </Box>
-                  ) : (
-                    <img src={item.thumbnail} height="120px" />
-                  )}
+                  Ảnh đại diện
                 </Grid>
                 <Grid
                   item
                   xs={1}
                   sx={{
-                    color: '#1a1a1a',
-                    fontSize: '16px',
+                    textAlign: 'center',
+                    color: '#fff',
                     fontWeight: 600,
-                    textAlign: 'left',
+                    fontSize: '16px',
+                    borderTop: '1px solid #26787c',
                     borderBottom: '1px solid #26787c',
-                    borderTop: 'none',
-                    padding: '12px 24px',
+                    padding: '12px 6px',
+                    backgroundColor: '#26787c',
                   }}
                 >
-                  {editIndex === index ? (
-                    <Switch checked={editActive} onClick={() => setEditActive((x) => !x)}></Switch>
-                  ) : (
-                    <Switch disabled checked={item.isActive} onChange={() => setEditActive((x) => !x)} />
-                  )}
+                  Kích hoạt
                 </Grid>
                 <Grid
                   item
                   xs={2}
                   sx={{
-                    color: '#1a1a1a',
+                    textAlign: 'center',
+                    color: '#fff',
+                    fontWeight: 600,
                     fontSize: '16px',
-                    fontWeight: 400,
-                    display: 'flex',
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    columnGap: '8px',
                     border: '1px solid #26787c',
-                    borderTop: 'none',
                     padding: '12px 6px',
-                    gap: '8px',
+                    borderTopRightRadius: '12px',
+                    backgroundColor: '#26787c',
                   }}
                 >
-                  {editIndex === index ? (
-                    <>
-                      <Button
-                        variant="contained"
-                        onClick={() => handleUpdate(index)}
-                        startIcon={<CheckCircleIcon sx={{ width: '16px', height: '16px' }} />}
-                        sx={{ fontSize: '16', fontWeight: 600, backgroundColor: '#28BFDF  ', '&:hover': { backgroundColor: '#28BFDF ' } }}
-                      >
-                        OK
-                      </Button>
-                      <Button
-                        variant="contained"
-                        onClick={() => setEditIndex(-1)}
-                        color="warning"
-                        startIcon={<CancelIcon sx={{ width: '16px', height: '16px' }} />}
-                        sx={{ fontSize: '16', fontWeight: 600 }}
-                      >
-                        Cancel
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button
-                        variant="contained"
-                        onClick={() => handleEditEvent(index, item.isActive)}
-                        startIcon={<BorderColorIcon sx={{ width: '16px', height: '16px' }} />}
-                        sx={{ fontSize: '16', fontWeight: 600, backgroundColor: '#93B775', '&:hover': { backgroundColor: '#7F9C20  ' } }}
-                      >
-                        Sửa
-                      </Button>
-                      <Button
-                        variant="contained"
-                        onClick={() => handleDeleteEvent(index)}
-                        startIcon={<DeleteOutlineIcon sx={{ width: '16px', height: '16px' }} />}
-                        sx={{ fontSize: '16', fontWeight: 600, backgroundColor: '#fa4653', '&:hover': { backgroundColor: '#c53b42  ' } }}
-                      >
-                        Xóa
-                      </Button>
-                    </>
-                  )}
+                  Hành động
                 </Grid>
               </Grid>
-            ))}
-          </Box>
+              {categoryList.map((item, index) => (
+                <Grid
+                  key={index}
+                  container
+                  sx={{
+                    width: '100%',
+                    backgroundColor: index === editIndex ? '#26787c20' : '#fff',
+
+                    '& .MuiGrid-item': {
+                      display: 'flex',
+                      flexDirection: 'row',
+                      flexWrap: 'wrap',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    },
+                  }}
+                >
+                  <Grid
+                    item
+                    xs={1}
+                    sx={{
+                      color: '#1a1a1a',
+                      fontSize: '16px',
+                      fontWeight: 400,
+                      textAlign: 'center',
+                      border: '1px solid #26787c',
+                      borderTop: 'none',
+                      padding: '12px 6px',
+                    }}
+                  >
+                    {index + 1}
+                  </Grid>
+                  <Grid
+                    item
+                    xs={2}
+                    sx={{
+                      color: '#1a1a1a',
+                      fontSize: '16px',
+                      fontWeight: 600,
+                      textAlign: 'left',
+                      borderBottom: '1px solid #26787c',
+                      borderTop: 'none',
+                      padding: '4px 12px',
+                      justifyContent: 'start !important',
+                    }}
+                  >
+                    {editIndex === index ? (
+                      <TextField
+                        sx={{
+                          backgroundColor: '#fff',
+                          borderRadius: '12px',
+
+                          '& fieldset': {
+                            borderColor: '#26787c',
+                          },
+
+                          '& .MuiFormLabel-root': {
+                            color: '#26787c',
+                          },
+                        }}
+                        fullWidth
+                        value={editName}
+                        onChange={(e: any) => setEditName(e.target.value)}
+                      ></TextField>
+                    ) : (
+                      <span>{item.name}</span>
+                    )}
+                  </Grid>
+                  <Grid
+                    item
+                    xs={3}
+                    sx={{
+                      color: '#1a1a1a',
+                      fontSize: '16px',
+                      fontWeight: 600,
+                      textAlign: 'left',
+                      borderBottom: '1px solid #26787c',
+                      borderTop: 'none',
+                      padding: '4px 12px',
+                      justifyContent: 'start !important',
+                    }}
+                  >
+                    {editIndex === index ? (
+                      <TextField
+                        sx={{
+                          backgroundColor: '#fff',
+                          borderRadius: '12px',
+
+                          '& fieldset': {
+                            borderColor: '#26787c',
+                          },
+
+                          '& .MuiFormLabel-root': {
+                            color: '#26787c',
+                          },
+                        }}
+                        fullWidth
+                        value={editDetail}
+                        onChange={(e: any) => setEditDetail(e.target.value)}
+                      ></TextField>
+                    ) : (
+                      <span>{item.detail}</span>
+                    )}
+                  </Grid>
+                  <Grid
+                    item
+                    xs={3}
+                    sx={{
+                      color: '#1a1a1a',
+                      fontSize: '16px',
+                      fontWeight: 600,
+                      textAlign: 'left',
+                      borderBottom: '1px solid #26787c',
+                      borderTop: 'none',
+                      padding: '4px 12px',
+
+                      '& img': {
+                        height: '80px',
+                        marginX: 'auto',
+                      },
+                    }}
+                  >
+                    {editIndex === index ? (
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                        }}
+                      >
+                        <input type="file" accept="image/*" onChange={handleUpdateFileChange} style={{ display: 'none' }} id="upload-image" />
+                        <label htmlFor="upload-image">
+                          <Button sx={{ backgroundColor: '#26787c', borderRadius: '4px' }} variant="contained" component="span">
+                            Chọn ảnh khác
+                          </Button>
+                        </label>
+                        {updateThumbnailPreview && <img src={updateThumbnailPreview} alt="Selected" style={{ marginTop: '10px', width: '100%' }} />}
+                        {updateFile && <Typography sx={{ color: '#1a1a1a' }}>{updateFile.name}</Typography>}
+                      </Box>
+                    ) : (
+                      <img src={item.thumbnail} />
+                    )}
+                  </Grid>
+                  <Grid
+                    item
+                    xs={1}
+                    sx={{
+                      color: '#1a1a1a',
+                      fontSize: '16px',
+                      fontWeight: 600,
+                      textAlign: 'left',
+                      borderBottom: '1px solid #26787c',
+                      borderTop: 'none',
+                      padding: '4px 12px',
+                    }}
+                  >
+                    {editIndex === index ? (
+                      <Switch checked={editActive} onClick={() => setEditActive((x) => !x)}></Switch>
+                    ) : (
+                      <Switch disabled checked={item.isActive} onChange={() => setEditActive((x) => !x)} />
+                    )}
+                  </Grid>
+                  <Grid
+                    item
+                    xs={2}
+                    sx={{
+                      color: '#1a1a1a',
+                      fontSize: '16px',
+                      fontWeight: 400,
+                      display: 'flex',
+                      flexDirection: 'row',
+                      flexWrap: 'wrap',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      columnGap: '8px',
+                      border: '1px solid #26787c',
+                      borderTop: 'none',
+                      padding: '12px 6px',
+                      gap: '8px',
+                    }}
+                  >
+                    {editIndex === index ? (
+                      <>
+                        <Button
+                          variant="contained"
+                          onClick={() => handleUpdate(index)}
+                          startIcon={<CheckCircleIcon sx={{ width: '16px', height: '16px' }} />}
+                          sx={{ fontSize: '16', fontWeight: 600, backgroundColor: '#28BFDF  ', '&:hover': { backgroundColor: '#28BFDF ' } }}
+                        >
+                          OK
+                        </Button>
+                        <Button
+                          variant="contained"
+                          onClick={() => setEditIndex(-1)}
+                          color="warning"
+                          startIcon={<CancelIcon sx={{ width: '16px', height: '16px' }} />}
+                          sx={{ fontSize: '16', fontWeight: 600 }}
+                        >
+                          Cancel
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          variant="contained"
+                          onClick={() => handleEditEvent(index, item.isActive)}
+                          startIcon={<BorderColorIcon sx={{ width: '16px', height: '16px' }} />}
+                          sx={{ fontSize: '16', fontWeight: 600, backgroundColor: '#93B775', '&:hover': { backgroundColor: '#7F9C20  ' } }}
+                        >
+                          Sửa
+                        </Button>
+                        <Button
+                          variant="contained"
+                          onClick={() => handleDeleteEvent(index)}
+                          startIcon={<DeleteOutlineIcon sx={{ width: '16px', height: '16px' }} />}
+                          sx={{ fontSize: '16', fontWeight: 600, backgroundColor: '#fa4653', '&:hover': { backgroundColor: '#c53b42  ' } }}
+                        >
+                          Xóa
+                        </Button>
+                      </>
+                    )}
+                  </Grid>
+                </Grid>
+              ))}
+            </Box>
+            <Pagination sx={{ marginLeft: 'auto' }} onChange={(e, v) => setPage(v)} count={categoryTotalPage} size="small" />
+          </Container>
           {isLoading && (
             <Box
               sx={{

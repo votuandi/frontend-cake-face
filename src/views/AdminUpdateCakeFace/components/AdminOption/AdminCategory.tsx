@@ -249,19 +249,6 @@ export default function AdminCategory() {
             fontFamily: 'Open Sans',
           }}
         >
-          {isShowMenu && isSmallScreenMenu && (
-            <Box
-              sx={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                zIndex: 99,
-              }}
-              ref={menuRef}
-            >
-              <AppAdminMenu />
-            </Box>
-          )}
           <Box
             sx={{
               width: '100%',
@@ -282,21 +269,6 @@ export default function AdminCategory() {
                 gap: '8px',
               }}
             >
-              {isSmallScreenMenu && (
-                <Button
-                  sx={{
-                    backgroundColor: '#26787c',
-                    padding: '12px ',
-                    fontWeight: 600,
-                    fontSize: '16px',
-                    color: '#fff',
-                    '&:hover': { backgroundColor: '#7C310A' },
-                  }}
-                  onClick={() => setIsShowMenu((x) => !x)}
-                >
-                  <MenuIcon sx={{ color: '#fff' }} />
-                </Button>
-              )}
               <Typography
                 variant="headerSemi35"
                 sx={{
