@@ -7,16 +7,50 @@ import { ADMIN_MENU } from '@/utils/constants/menu.constant'
 import { gotoPage } from '@/utils/helpers/common'
 import { useTranslation } from 'next-i18next'
 import Link from 'next/link'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '@/store/rootReducer'
+import { getSettings } from '@/store/setting/setting.action'
+import { LOGO_TYPE } from '@/utils/api/setting'
+import { useEffect, useState } from 'react'
+import { useIsMounted } from 'usehooks-ts'
 
 type IProps = {}
 
 const AppAdminMenu = (props: IProps, ref: React.ForwardedRef<any>) => {
   const { t, i18n } = useTranslation()
   const router = useRouter()
+  const dispatch = useDispatch()
+  const { settings } = useSelector((state: RootState) => state.setting)
 
   const { classes } = useStyles({
     params: {},
   })
+
+  const [currentLogo, setCurrentLogo] = useState<{ small: string; full: string }>({ small: '', full: '' })
+
+  let fetchSettings = async () => {
+    dispatch(getSettings())
+  }
+
+  let FetchData = async () => {
+    await fetchSettings()
+  }
+
+  useEffect(() => {
+    if (isMounted()) return
+    FetchData()
+  }, [])
+
+  useEffect(() => {
+    let smLogo = settings.findLast((x) => x.name === `${LOGO_TYPE.SMALL}_logo`)
+    let flLogo = settings.findLast((x) => x.name === `${LOGO_TYPE.FULL}_logo`)
+    setCurrentLogo({
+      small: smLogo ? smLogo.value : '',
+      full: flLogo ? flLogo.value : '',
+    })
+  }, [settings])
+
+  let isMounted = useIsMounted()
 
   return (
     <Box
@@ -49,7 +83,7 @@ const AppAdminMenu = (props: IProps, ref: React.ForwardedRef<any>) => {
         }}
       >
         <Link href="/">
-          <img className="logo" src="/image/abaso-full-logo.png" alt="" />
+          <img className="logo" src={currentLogo.full ? currentLogo.full : ''} alt="" />
         </Link>
       </Box>
       {ADMIN_MENU.map((item, index) => {

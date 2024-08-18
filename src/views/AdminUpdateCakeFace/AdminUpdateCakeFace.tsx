@@ -24,25 +24,8 @@ import {
   useMediaQuery,
 } from '@mui/material'
 import Head from 'next/head'
-import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined'
-import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined'
-import PhotoLibraryOutlinedIcon from '@mui/icons-material/PhotoLibraryOutlined'
-import EventAvailableOutlinedIcon from '@mui/icons-material/EventAvailableOutlined'
-import AspectRatioOutlinedIcon from '@mui/icons-material/AspectRatioOutlined'
-import FilePresentIcon from '@mui/icons-material/FilePresent'
-import { convertToEmbed, convertToEmbedPreview, formatDate } from '@/utils/helpers/common'
-import parse from 'html-react-parser'
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
-import { ARTICLE_CONTENT_TYPES, ARTICLE_CONTENT_WIDTHS } from '@/types/common'
-import { ARTICLE_CONTENT_LIST, ARTICLE_CONTENT_WIDTH_LIST, QUILL_FORMAT, QUILL_MODULES } from '@/utils/constants/common.constant'
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import CancelIcon from '@mui/icons-material/Cancel'
 import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
-import VisibilityIcon from '@mui/icons-material/Visibility'
-import CloseIcon from '@mui/icons-material/Close'
-import BorderColorIcon from '@mui/icons-material/BorderColor'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import theme from '@/assets/theme'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/store/rootReducer'
@@ -54,6 +37,8 @@ import { cakeFaceApi } from '@/utils/api'
 import { UPDATE_CAKE_FACE_DTO } from '@/utils/api/cakeFace'
 import AdminOption from './components/AdminOption'
 import AdminConfigFiles from './components/AdminConfigFiles'
+import { QUILL_FORMAT, QUILL_MODULES } from '@/utils/constants/common.constant'
+import { getSettings } from '@/store/setting/setting.action'
 
 export default function AdminUpdateCakeFace() {
   const { t, i18n } = useTranslation()
@@ -63,7 +48,11 @@ export default function AdminUpdateCakeFace() {
   const dispatch = useDispatch()
   const { cakeFaceDetail } = useSelector((state: RootState) => state.cakeFace)
   const { categoryList } = useSelector((state: RootState) => state.category)
+  const { settings } = useSelector((state: RootState) => state.setting)
 
+  const [icon, setIcon] = useState<string>('')
+  const [logo, setLogo] = useState<string>('')
+  const [seoContent, setSeoContent] = useState<string>('')
   const [cakeFaceId, setCakeFaceId] = useState<string>('')
   const [name, setName] = useState<string>('')
   const [detail, setDetail] = useState<string>('')
@@ -192,6 +181,7 @@ export default function AdminUpdateCakeFace() {
   const FetchData = async (id?: string) => {
     fetchCakeFaceDetail(id)
     fetchCategoryList()
+    dispatch(getSettings())
   }
 
   useEffect(() => {
@@ -211,6 +201,14 @@ export default function AdminUpdateCakeFace() {
     console.log(cakeFaceDetail)
   }, [cakeFaceDetail])
 
+  useEffect(() => {
+    settings.forEach((x) => {
+      if (x.name === 'seo_content') setSeoContent(x.value)
+      if (x.name === 'ico_logo') setIcon(x.value)
+      if (x.name === 'full_logo') setLogo(x.value)
+    })
+  }, [settings])
+
   const { classes } = useStyles({ params: {} })
   let isMounted = useIsMounted()
 
@@ -219,7 +217,7 @@ export default function AdminUpdateCakeFace() {
       <Head>
         <title>Admin</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href={icon} />
       </Head>
       <main>
         <Box

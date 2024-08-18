@@ -24,33 +24,14 @@ import {
   useMediaQuery,
 } from '@mui/material'
 import Head from 'next/head'
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import CancelIcon from '@mui/icons-material/Cancel'
 import { formatDate, gotoPage } from '@/utils/helpers/common'
-import BorderColorIcon from '@mui/icons-material/BorderColor'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
-import LocalOfferIcon from '@mui/icons-material/LocalOffer'
 import theme from '@/assets/theme'
-import MenuIcon from '@mui/icons-material/Menu'
-import AppAdminMenu from '@/components/AppAdminMenu'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/store/rootReducer'
-import { getCakeFaceList } from '@/store/cakeFace/cakeFace.action'
-import { getCategoryList } from '@/store/category/category.action'
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
-import DownloadIcon from '@mui/icons-material/Download'
-import { QUILL_FORMAT, QUILL_MODULES, ROLE_TYPE } from '@/utils/constants/common.constant'
-import ReactQuill from 'react-quill'
-import 'react-quill/dist/quill.snow.css'
-import { cakeFaceApi } from '@/utils/api'
-import parse from 'html-react-parser'
-import Link from 'next/link'
-import UndoIcon from '@mui/icons-material/Undo'
-import { CAKE_FACE_ITEM_TYPE } from '@/utils/api/cakeFace'
 import { GET_USER_LIST_PAYLOAD } from '@/utils/api/user'
 import { getUserList } from '@/store/user/user.action'
 import CreateAccount from './components/CreateAccount'
+import { getSettings } from '@/store/setting/setting.action'
 
 export default function AdminUser() {
   const { t, i18n } = useTranslation()
@@ -60,7 +41,11 @@ export default function AdminUser() {
   const menuRef = useRef(null)
   const dispatch = useDispatch()
   const { userList, userListLoading, userListError, userTotalPage } = useSelector((state: RootState) => state.user)
+  const { settings } = useSelector((state: RootState) => state.setting)
 
+  const [icon, setIcon] = useState<string>('')
+  const [logo, setLogo] = useState<string>('')
+  const [seoContent, setSeoContent] = useState<string>('')
   const [isShowMenu, setIsShowMenu] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [selectedRole, setSelectedRole] = useState<'admin' | 'client' | 'user' | '_'>('_')
@@ -93,6 +78,7 @@ export default function AdminUser() {
 
   let FetchData = async () => {
     await fetchUsers()
+    dispatch(getSettings())
   }
 
   let closeMenuPopup = () => {
@@ -115,15 +101,23 @@ export default function AdminUser() {
     fetchUsers()
   }, [selectedRole, keyword])
 
+  useEffect(() => {
+    settings.forEach((x) => {
+      if (x.name === 'seo_content') setSeoContent(x.value)
+      if (x.name === 'ico_logo') setIcon(x.value)
+      if (x.name === 'full_logo') setLogo(x.value)
+    })
+  }, [settings])
+
   const { classes } = useStyles({ params: {} })
   let isMounted = useIsMounted()
 
   return (
     <>
       <Head>
-        <title>Admin</title>
+        <title>Admin - Tìm bánh</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href={icon} />
       </Head>
       <main>
         <Box

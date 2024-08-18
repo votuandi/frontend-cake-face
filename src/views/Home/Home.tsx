@@ -16,6 +16,8 @@ import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import DownloadIcon from '@mui/icons-material/Download'
 import Slider from 'react-slick'
 import { getBanners } from '@/store/banner/banner.action'
+import { getSettings } from '@/store/setting/setting.action'
+import Head from 'next/head'
 
 const TAB_TITLES = ['News', 'Promotion']
 
@@ -38,7 +40,11 @@ export default function Home() {
 
   const { categoryList } = useSelector((state: RootState) => state.category)
   const { cakeFaceList, trendyCakeFaceList } = useSelector((state: RootState) => state.cakeFace)
+  const { settings } = useSelector((state: RootState) => state.setting)
 
+  const [icon, setIcon] = useState<string>('')
+  const [logo, setLogo] = useState<string>('')
+  const [seoContent, setSeoContent] = useState<string>('')
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('')
   const [sortBy, setSortBy] = useState<SORT_BY_TYPE>('name')
   const [selectedName, setSelectedName] = useState<string>()
@@ -47,6 +53,7 @@ export default function Home() {
     dispatch(getCategoryList({ params: { isActive: '1' } }))
     dispatch(getTrendyCakeFaceList({ params: { isActive: '1', isTrendy: '1' } }))
     dispatch(getCakeFaceList({ params: { isActive: '1' } }))
+    dispatch(getSettings())
   }
 
   useEffect(() => {
@@ -87,75 +94,92 @@ export default function Home() {
     console.log(router.query)
   }, [router.query])
 
+  useEffect(() => {
+    settings.forEach((x) => {
+      if (x.name === 'seo_content') setSeoContent(x.value)
+      if (x.name === 'ico_logo') setIcon(x.value)
+      if (x.name === 'full_logo') setLogo(x.value)
+    })
+  }, [settings])
+
   const { classes } = useStyles({ params: {} })
   let isMounted = useIsMounted()
 
   return (
-    <Box
-      sx={{
-        width: '100%',
-        // height: '100vh',
-        position: 'relative',
-        paddingBottom: '80px',
-      }}
-    >
-      <AppBanner />
-      <Container
-        maxWidth="lg"
+    <>
+      <Head>
+        <title>Tìm Bánh - Thiên Đường Bánh Thiết Kế Theo Ý Bạn -Timbanh.com</title>
+        <link rel="icon" href={icon} />
+        <meta name="description" content={seoContent} />
+        <meta property="og:title" content="Tìm Bánh - Thiên Đường Bánh Thiết Kế Theo Ý Bạn -Timbanh.com" />
+        <meta property="og:description" content={seoContent} />
+        <meta property="og:image" content={logo} />
+      </Head>
+      <Box
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'start',
-          alignItems: 'start',
-          // marginTop: '10px',
+          width: '100%',
+          // height: '100vh',
+          position: 'relative',
+          paddingBottom: '80px',
         }}
       >
-        <Box sx={{ width: '100%', '& .slick-slide': { margin: '0px 2px' } }}>
-          <Typography sx={{ fontSize: '20px', fontWeight: 800, color: '#0596A6', fontFamily: 'Open Sans', padding: '12px 0 8px 0' }}>Mẫu bánh Hot Trend</Typography>
-          <Slider {...SLIDER_SETTING}>
-            {trendyCakeFaceList.map((item, index) => {
-              return (
-                <Box
-                  key={index}
-                  sx={{
-                    width: '100%',
-                    aspectRatio: 1,
-                    backgroundImage: `url('${item?.thumbnail.replaceAll(/\\/g, '/')}')`,
-                    backgroundPosition: 'center',
-                    backgroundSize: 'cover',
-                    position: 'relative',
-                    borderRadius: '4px',
-                  }}
-                >
+        <AppBanner />
+        <Container
+          maxWidth="lg"
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'start',
+            alignItems: 'start',
+            // marginTop: '10px',
+          }}
+        >
+          <Box sx={{ width: '100%', '& .slick-slide': { margin: '0px 2px' } }}>
+            <Typography sx={{ fontSize: '20px', fontWeight: 800, color: '#0596A6', fontFamily: 'Open Sans', padding: '12px 0 8px 0' }}>Mẫu bánh Hot Trend</Typography>
+            <Slider {...SLIDER_SETTING}>
+              {trendyCakeFaceList.map((item, index) => {
+                return (
                   <Box
+                    key={index}
                     sx={{
                       width: '100%',
-                      position: 'absolute',
-                      bottom: 0,
-                      left: 0,
-                      padding: '4px',
+                      aspectRatio: 1,
+                      backgroundImage: `url('${item?.thumbnail.replaceAll(/\\/g, '/')}')`,
+                      backgroundPosition: 'center',
+                      backgroundSize: 'cover',
+                      position: 'relative',
                       borderRadius: '4px',
-                      background: 'linear-gradient(180deg, rgba(207,255,203,0) 0%, rgba(34,93,97,0.65) 50%, rgba(34,93,97,1) 100%)',
                     }}
                   >
-                    <Typography
-                      className="text-1-line"
+                    <Box
                       sx={{
-                        fontSize: '16px',
-                        fontWeight: 600,
-                        fontFamily: 'Open Sans',
-                        color: '#fff',
+                        width: '100%',
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        padding: '4px',
+                        borderRadius: '4px',
+                        background: 'linear-gradient(180deg, rgba(207,255,203,0) 0%, rgba(34,93,97,0.65) 50%, rgba(34,93,97,1) 100%)',
                       }}
                     >
-                      {item?.name}
-                    </Typography>
+                      <Typography
+                        className="text-1-line"
+                        sx={{
+                          fontSize: '16px',
+                          fontWeight: 600,
+                          fontFamily: 'Open Sans',
+                          color: '#fff',
+                        }}
+                      >
+                        {item?.name}
+                      </Typography>
+                    </Box>
                   </Box>
-                </Box>
-              )
-            })}
-          </Slider>
-        </Box>
-        {/* <Box
+                )
+              })}
+            </Slider>
+          </Box>
+          {/* <Box
         sx={{
           width: '100%',
           display: 'flex',
@@ -191,227 +215,230 @@ export default function Home() {
           </Box>
         ))}
       </Box> */}
-        <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'Open Sans', width: '100%', margin: '16px 0 10px 0' }}>
-          <Typography sx={{ fontSize: '20px', fontWeight: 800, color: '#0596A6' }}>Đa dạng chủ đề bánh</Typography>
-          <FormControl>
-            <InputLabel
-              sx={{
-                fontSize: '14px',
-                color: '#0596A6',
-                backgroundColor: '#fff',
-              }}
-              id="category-label"
-            >
-              Sắp xếp theo
-            </InputLabel>
-            <Select
-              sx={{
-                backgroundColor: '#fff',
-                width: '120px',
-                '& .MuiFormHelperText-root': {
-                  backgroundColor: 'transparent',
-                  color: 'red',
-                },
-                '& .MuiSelect-outlined': {
-                  padding: '3px 16px',
-                },
-              }}
-              defaultValue={sortBy}
-              onChange={(e: any) => setSortBy(e.target.value)}
-            >
-              {CAKE_FACE_SORT_LIST.map((sortByItem) => (
-                <MenuItem
-                  sx={{
-                    fontFamily: 'Open Sans',
-                  }}
-                  key={sortByItem.value}
-                  value={sortByItem.value}
-                >
-                  {sortByItem.title}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Box>
-        <Box
-          sx={{
-            display: 'flex',
-            height: '160px',
-            flexDirection: 'column',
-            flexWrap: 'wrap',
-            overflow: 'auto',
-          }}
-        >
-          {categoryList.map((item, index) => (
-            <Box
-              key={index}
-              onClick={() => setSelectedCategoryId((x) => (x === item.id ? '' : item.id))}
-              sx={{
-                width: '80px',
-                height: '80px',
-                display: 'flex',
-                flexDirection: 'column',
-                padding: '4px',
-                gap: '4px',
-                alignItems: 'center',
-                fontFamily: 'Open Sans',
-                backgroundColor: selectedCategoryId === item.id ? 'rgba(181,231,208,.6)' : '#fff',
-                borderRadius: '4px',
-                cursor: 'pointer',
-
-                '&:hover': {
-                  backgroundColor: 'rgba(181, 231, 208, 0.2)',
-                },
-
-                '& img': {
-                  width: '36px',
-                  height: '36px',
-                },
-              }}
-            >
-              <img src={item?.thumbnail} alt="" />
-              <Typography
-                className="text-2-line"
-                sx={{ fontSize: '12px', lineHeight: 1.5, textAlign: 'center', fontWeight: selectedCategoryId === item.id ? 700 : 500, color: '#26787c' }}
-              >
-                {item?.name}
-              </Typography>
-            </Box>
-          ))}
-        </Box>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            width: '100%',
-            justifyContent: 'end',
-            alignItems: 'center',
-            fontFamily: 'Open Sans',
-          }}
-        ></Box>
-
-        <Grid container spacing="12px" sx={{ margin: '40px 0 40px -12px' }}>
-          {cakeFaceList.map((item) => (
-            <Grid
-              item
-              mobile={6}
-              sm={4}
-              md={3}
-              key={item?.id}
-              sx={{
-                gap: 2,
-              }}
-            >
-              <Box
-                onClick={() => router.push(`/cake-face/${item?.id}`)}
+          <Box
+            sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'Open Sans', width: '100%', margin: '16px 0 10px 0' }}
+          >
+            <Typography sx={{ fontSize: '20px', fontWeight: 800, color: '#0596A6' }}>Đa dạng chủ đề bánh</Typography>
+            <FormControl>
+              <InputLabel
                 sx={{
-                  width: '100%',
-                  aspectRatio: isMobile ? 2 / 3 : 0.75,
-                  border: '1px solid #ceced080',
-                  borderRadius: '8px',
+                  fontSize: '14px',
+                  color: '#0596A6',
+                  backgroundColor: '#fff',
+                }}
+                id="category-label"
+              >
+                Sắp xếp theo
+              </InputLabel>
+              <Select
+                sx={{
+                  backgroundColor: '#fff',
+                  width: '120px',
+                  '& .MuiFormHelperText-root': {
+                    backgroundColor: 'transparent',
+                    color: 'red',
+                  },
+                  '& .MuiSelect-outlined': {
+                    padding: '3px 16px',
+                  },
+                }}
+                defaultValue={sortBy}
+                onChange={(e: any) => setSortBy(e.target.value)}
+              >
+                {CAKE_FACE_SORT_LIST.map((sortByItem) => (
+                  <MenuItem
+                    sx={{
+                      fontFamily: 'Open Sans',
+                    }}
+                    key={sortByItem.value}
+                    value={sortByItem.value}
+                  >
+                    {sortByItem.title}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+          <Box
+            sx={{
+              display: 'flex',
+              height: '160px',
+              flexDirection: 'column',
+              flexWrap: 'wrap',
+              overflow: 'auto',
+            }}
+          >
+            {categoryList.map((item, index) => (
+              <Box
+                key={index}
+                onClick={() => setSelectedCategoryId((x) => (x === item.id ? '' : item.id))}
+                sx={{
+                  width: '80px',
+                  height: '80px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  padding: '4px',
+                  gap: '4px',
+                  alignItems: 'center',
+                  fontFamily: 'Open Sans',
+                  backgroundColor: selectedCategoryId === item.id ? 'rgba(181,231,208,.6)' : '#fff',
+                  borderRadius: '4px',
                   cursor: 'pointer',
 
                   '&:hover': {
-                    boxShadow: 2,
+                    backgroundColor: 'rgba(181, 231, 208, 0.2)',
+                  },
+
+                  '& img': {
+                    width: '36px',
+                    height: '36px',
                   },
                 }}
               >
+                <img src={item?.thumbnail} alt="" />
+                <Typography
+                  className="text-2-line"
+                  sx={{ fontSize: '12px', lineHeight: 1.5, textAlign: 'center', fontWeight: selectedCategoryId === item.id ? 700 : 500, color: '#26787c' }}
+                >
+                  {item?.name}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              width: '100%',
+              justifyContent: 'end',
+              alignItems: 'center',
+              fontFamily: 'Open Sans',
+            }}
+          ></Box>
+
+          <Grid container spacing="12px" sx={{ margin: '40px 0 40px -12px' }}>
+            {cakeFaceList.map((item) => (
+              <Grid
+                item
+                mobile={6}
+                sm={4}
+                md={3}
+                key={item?.id}
+                sx={{
+                  gap: 2,
+                }}
+              >
                 <Box
+                  onClick={() => router.push(`/cake-face/${item?.id}`)}
                   sx={{
                     width: '100%',
-                    aspectRatio: 1.25,
-                    backgroundImage: `url('${item?.thumbnail.replaceAll(/\\/g, '/')}')`,
-                    backgroundPosition: 'center',
-                    backgroundSize: 'cover',
-                    backgroundRepeat: 'no-repeat',
-                    borderTopLeftRadius: '8px',
-                    borderTopRightRadius: '8px',
-                  }}
-                ></Box>
-                <Box
-                  sx={{
-                    padding: '4px 6px',
-                    fontFamily: 'Open Sans',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
+                    aspectRatio: isMobile ? 2 / 3 : 0.75,
+                    border: '1px solid #ceced080',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+
+                    '&:hover': {
+                      boxShadow: 2,
+                    },
                   }}
                 >
+                  <Box
+                    sx={{
+                      width: '100%',
+                      aspectRatio: 1.25,
+                      backgroundImage: `url('${item?.thumbnail.replaceAll(/\\/g, '/')}')`,
+                      backgroundPosition: 'center',
+                      backgroundSize: 'cover',
+                      backgroundRepeat: 'no-repeat',
+                      borderTopLeftRadius: '8px',
+                      borderTopRightRadius: '8px',
+                    }}
+                  ></Box>
                   <Box
                     sx={{
                       padding: '4px 6px',
                       fontFamily: 'Open Sans',
-                      gap: '4px',
                       display: 'flex',
                       flexDirection: 'column',
-                    }}
-                  >
-                    <Typography
-                      className="text-2-line"
-                      sx={{
-                        color: '#249580',
-                        fontWeight: 700,
-                        fontSize: isMobile ? '18px' : '22px',
-                        height: isMobile ? '48px' : '60px',
-                      }}
-                    >
-                      {item?.name}
-                    </Typography>
-                    <Typography
-                      className="text-2-line"
-                      sx={{
-                        color: '#1a1a1a',
-                        fontWeight: 400,
-                        fontSize: isMobile ? '12px' : '14px',
-                        height: isMobile ? '34px' : '38px',
-                      }}
-                    >
-                      {item?.detail}
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      width: '100%',
                       justifyContent: 'space-between',
-                      alignItems: 'center',
-                      gap: '6px',
-                      mt: '4px',
                     }}
                   >
                     <Box
                       sx={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        width: 'fit-content',
+                        padding: '4px 6px',
+                        fontFamily: 'Open Sans',
                         gap: '4px',
+                        display: 'flex',
+                        flexDirection: 'column',
                       }}
                     >
-                      <VisibilityOutlinedIcon sx={{ color: '#EDC458', height: '20px' }} />
-                      <Typography sx={{ fontFamily: 'Open Sans', fontSize: '16px', fontWeight: 400, color: '#EDC458' }}>{item?.viewAmount}</Typography>
+                      <Typography
+                        className="text-2-line"
+                        sx={{
+                          color: '#249580',
+                          fontWeight: 700,
+                          fontSize: isMobile ? '18px' : '22px',
+                          height: isMobile ? '48px' : '60px',
+                        }}
+                      >
+                        {item?.name}
+                      </Typography>
+                      <Typography
+                        className="text-2-line"
+                        sx={{
+                          color: '#1a1a1a',
+                          fontWeight: 400,
+                          fontSize: isMobile ? '12px' : '14px',
+                          height: isMobile ? '34px' : '38px',
+                        }}
+                      >
+                        {item?.detail}
+                      </Typography>
                     </Box>
                     <Box
                       sx={{
                         display: 'flex',
                         flexDirection: 'row',
-                        justifyContent: 'start',
+                        width: '100%',
+                        justifyContent: 'space-between',
                         alignItems: 'center',
-                        width: 'fit-content',
-                        gap: '4px',
+                        gap: '6px',
+                        mt: '4px',
                       }}
                     >
-                      <DownloadIcon sx={{ color: '#EDC458', height: '20px' }} />
-                      <Typography sx={{ fontFamily: 'Open Sans', fontSize: '16px', fontWeight: 400, color: '#EDC458' }}>{item?.downloadAmount}</Typography>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          width: 'fit-content',
+                          gap: '4px',
+                        }}
+                      >
+                        <VisibilityOutlinedIcon sx={{ color: '#EDC458', height: '20px' }} />
+                        <Typography sx={{ fontFamily: 'Open Sans', fontSize: '16px', fontWeight: 400, color: '#EDC458' }}>{item?.viewAmount}</Typography>
+                      </Box>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          justifyContent: 'start',
+                          alignItems: 'center',
+                          width: 'fit-content',
+                          gap: '4px',
+                        }}
+                      >
+                        <DownloadIcon sx={{ color: '#EDC458', height: '20px' }} />
+                        <Typography sx={{ fontFamily: 'Open Sans', fontSize: '16px', fontWeight: 400, color: '#EDC458' }}>{item?.downloadAmount}</Typography>
+                      </Box>
                     </Box>
                   </Box>
                 </Box>
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
-    </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </Box>
+    </>
   )
 }

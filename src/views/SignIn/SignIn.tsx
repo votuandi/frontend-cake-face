@@ -28,6 +28,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/store/rootReducer'
 import { getCurrentUserInfo } from '@/store/user/user.action'
 import Cookies from 'universal-cookie'
+import { getSettings } from '@/store/setting/setting.action'
+import Head from 'next/head'
 
 interface LoginFormValues {
   username: string
@@ -44,12 +46,17 @@ const validationSchema = Yup.object({
   password: Yup.string().required('Password is required'),
 })
 
-export default function Contact() {
+export default function SignIn() {
   const { t, i18n } = useTranslation()
   const locale = i18n.language
   const dispatch = useDispatch()
   const { currentUserInfo } = useSelector((state: RootState) => state.user)
   const cookies = new Cookies()
+  const { settings } = useSelector((state: RootState) => state.setting)
+
+  const [icon, setIcon] = useState<string>('')
+  const [logo, setLogo] = useState<string>('')
+  const [seoContent, setSeoContent] = useState<string>('')
 
   const formik = useFormik({
     initialValues: DEFAULT_INITIAL_VALUE,
@@ -91,6 +98,14 @@ export default function Contact() {
   }, [])
 
   useEffect(() => {
+    settings.forEach((x) => {
+      if (x.name === 'seo_content') setSeoContent(x.value)
+      if (x.name === 'ico_logo') setIcon(x.value)
+      if (x.name === 'small_logo') setLogo(x.value)
+    })
+  }, [settings])
+
+  useEffect(() => {
     if (currentUserInfo) {
       setCookie(COOKIE_USERNAME, currentUserInfo.userName, { maxAge: MAX_AGE })
       setCookie(COOKIE_USER_NAME, currentUserInfo.name, { maxAge: MAX_AGE })
@@ -102,76 +117,90 @@ export default function Contact() {
     }
   }, [currentUserInfo])
 
+  useEffect(() => {
+    dispatch(getSettings())
+  }, [dispatch])
+
   const { classes } = useStyles({ params: {} })
   let isMounted = useIsMounted()
 
   return (
-    <Box
-      sx={{
-        width: '100%',
-        height: '100%',
-        position: 'relative',
-        padding: '16px',
-        backgroundColor: 'white',
-      }}
-    >
+    <>
+      <Head>
+        <title>Đăng nhập - Tìm Bánh - Thiên Đường Bánh Thiết Kế Theo Ý Bạn -Timbanh.com</title>
+        <link rel="icon" href={icon} />
+        <meta name="description" content={seoContent} />
+        <meta property="og:title" content="Đăng nhập - Tìm Bánh - Thiên Đường Bánh Thiết Kế Theo Ý Bạn -Timbanh.com" />
+        <meta property="og:description" content={seoContent} />
+        <meta property="og:image" content={logo} />
+      </Head>
       <Box
         sx={{
           width: '100%',
-          maxWidth: '520px',
-          display: 'flex',
-          flexDirection: 'column',
-          padding: '20px',
-          textAlign: 'center',
-          alignItems: 'center',
-          margin: '0 auto',
-          fontFamily: 'Open Sans',
-
-          '& .logo': {
-            width: '66%',
-            maxWidth: '200px',
-          },
+          height: '100%',
+          position: 'relative',
+          padding: '16px',
+          backgroundColor: 'white',
         }}
       >
-        <img className="logo" src="/image/abaso-full-logo.png" alt="" />
-        <Typography sx={{ fontWeight: 700, fontSize: '36px', color: '#314856', marginTop: '50px' }}>Đăng Nhập</Typography>
-        <Typography sx={{ fontWeight: 400, fontSize: '17px', color: '#5f6a6a', lineHeight: 1.5, marginTop: '4px' }}>Chào mừng bạn đã trở lại</Typography>
-        <form onSubmit={formik.handleSubmit} style={{ marginTop: '20px' }}>
-          <TextField
-            className={classes.textField}
-            name="username"
-            type="text"
-            label="Tên đăng nhập"
-            value={formik.values.username}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={formik.touched.username && Boolean(formik.errors.username)}
-            fullWidth
-            variant="outlined"
-            margin="normal"
-          />
-          <TextField
-            className={classes.textField}
-            name="password"
-            type="password"
-            label="Mật khẩu"
-            value={formik.values.password}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={formik.touched.password && Boolean(formik.errors.password)}
-            fullWidth
-            variant="outlined"
-            margin="normal"
-          />
-          {formik.isSubmitting && <LinearProgress />}
-          <Button variant="contained" color="primary" type="submit" fullWidth disabled={formik.isSubmitting} style={{ marginTop: '16px', padding: '12px 6px', fontSize: '18px' }}>
-            Đăng nhập
-          </Button>
-        </form>
-        <Link href="/forget-password">
-          <Typography sx={{ fontWeight: 600, fontSize: '14px', color: '#1a1a1a', lineHeight: 1.5, marginTop: '24px' }}>Bạn quên mật khẩu?</Typography>
-        </Link>
+        <Box
+          sx={{
+            width: '100%',
+            maxWidth: '520px',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '20px',
+            textAlign: 'center',
+            alignItems: 'center',
+            margin: '0 auto',
+            fontFamily: 'Open Sans',
+
+            '& .logo': {
+              width: '66%',
+              maxWidth: '200px',
+            },
+          }}
+        >
+          <img className="logo" src={logo} alt="" />
+          <Typography sx={{ fontWeight: 700, fontSize: '36px', color: '#314856', marginTop: '50px' }}>Đăng Nhập</Typography>
+          <Typography sx={{ fontWeight: 400, fontSize: '17px', color: '#5f6a6a', lineHeight: 1.5, marginTop: '4px' }}>Chào mừng bạn đã trở lại</Typography>
+          <form onSubmit={formik.handleSubmit} style={{ marginTop: '20px' }}>
+            <TextField
+              className={classes.textField}
+              name="username"
+              type="text"
+              label="Tên đăng nhập"
+              value={formik.values.username}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.username && Boolean(formik.errors.username)}
+              fullWidth
+              variant="outlined"
+              margin="normal"
+            />
+            <TextField
+              className={classes.textField}
+              name="password"
+              type="password"
+              label="Mật khẩu"
+              value={formik.values.password}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.password && Boolean(formik.errors.password)}
+              fullWidth
+              variant="outlined"
+              margin="normal"
+            />
+            {formik.isSubmitting && <LinearProgress />}
+            <Button variant="contained" color="primary" type="submit" fullWidth disabled={formik.isSubmitting} style={{ marginTop: '16px', padding: '12px 6px', fontSize: '18px' }}>
+              Đăng nhập
+            </Button>
+          </form>
+          <Link href="/forget-password">
+            <Typography sx={{ fontWeight: 600, fontSize: '14px', color: '#1a1a1a', lineHeight: 1.5, marginTop: '24px' }}>Bạn quên mật khẩu?</Typography>
+          </Link>
+        </Box>
       </Box>
-    </Box>
+    </>
   )
 }

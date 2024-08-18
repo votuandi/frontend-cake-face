@@ -17,6 +17,7 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import { RootState } from '@/store/rootReducer'
 import { getBanners } from '@/store/banner/banner.action'
 import { bannerApi } from '@/utils/api'
+import { getSettings } from '@/store/setting/setting.action'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -46,7 +47,11 @@ export default function AdminBanner() {
   const locale = i18n.language
   const dispatch = useDispatch()
   const { banners } = useSelector((state: RootState) => state.banner)
+  const { settings } = useSelector((state: RootState) => state.setting)
 
+  const [icon, setIcon] = useState<string>('')
+  const [logo, setLogo] = useState<string>('')
+  const [seoContent, setSeoContent] = useState<string>('')
   const [isLongerRatio, setIsLongerRatio] = useState<boolean>(false)
   const [isShowLoading, setIsShowLoading] = useState<boolean>(false)
 
@@ -119,6 +124,7 @@ export default function AdminBanner() {
 
   let FetchData = async () => {
     await GetBannerList()
+    dispatch(getSettings())
   }
 
   useEffect(() => {
@@ -131,6 +137,14 @@ export default function AdminBanner() {
     FetchData()
   }, [locale])
 
+  useEffect(() => {
+    settings.forEach((x) => {
+      if (x.name === 'seo_content') setSeoContent(x.value)
+      if (x.name === 'ico_logo') setIcon(x.value)
+      if (x.name === 'full_logo') setLogo(x.value)
+    })
+  }, [settings])
+
   const { classes } = useStyles({ params: {} })
   let isMounted = useIsMounted()
 
@@ -139,7 +153,7 @@ export default function AdminBanner() {
       <Head>
         <title>Admin</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href={icon} />
       </Head>
       <main>
         <>

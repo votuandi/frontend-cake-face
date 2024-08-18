@@ -15,7 +15,7 @@ export const getServerSideProps = (async ({ locale }) => {
 
 const ViewAccount = dynamic(() => import('@/views/Account'), {
   suspense: true,
-  ssr: false,
+  ssr: true,
 })
 
 const Account: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = (props) => {

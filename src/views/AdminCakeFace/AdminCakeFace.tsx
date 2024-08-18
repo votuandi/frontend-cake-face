@@ -45,6 +45,7 @@ import { cakeFaceApi } from '@/utils/api'
 import parse from 'html-react-parser'
 import Link from 'next/link'
 import UndoIcon from '@mui/icons-material/Undo'
+import { getSettings } from '@/store/setting/setting.action'
 
 export default function AdminCakeFace() {
   const { t, i18n } = useTranslation()
@@ -55,7 +56,11 @@ export default function AdminCakeFace() {
   const dispatch = useDispatch()
   const { cakeFaceList, cakeFaceListError, cakeFaceListLoading, cakeFaceTotalPage, cakeFaceTotalPageActive } = useSelector((state: RootState) => state.cakeFace)
   const { categoryList, categoryListLoading } = useSelector((state: RootState) => state.category)
+  const { settings } = useSelector((state: RootState) => state.setting)
 
+  const [icon, setIcon] = useState<string>('')
+  const [logo, setLogo] = useState<string>('')
+  const [seoContent, setSeoContent] = useState<string>('')
   const [isShowMenu, setIsShowMenu] = useState<boolean>(false)
   const [isShowNewPopup, setIsShowNewPopup] = useState<boolean>(false)
   const [newName, setNewName] = useState<string>('')
@@ -191,6 +196,7 @@ export default function AdminCakeFace() {
   let FetchData = async () => {
     await fetchCakeFaceList()
     await fetchCategoryList()
+    dispatch(getSettings())
   }
 
   let closeMenuPopup = () => {
@@ -213,6 +219,14 @@ export default function AdminCakeFace() {
     fetchCakeFaceList()
   }, [selectedCategoryId, page, search])
 
+  useEffect(() => {
+    settings.forEach((x) => {
+      if (x.name === 'seo_content') setSeoContent(x.value)
+      if (x.name === 'ico_logo') setIcon(x.value)
+      if (x.name === 'full_logo') setLogo(x.value)
+    })
+  }, [settings])
+
   const { classes } = useStyles({ params: {} })
   let isMounted = useIsMounted()
 
@@ -221,7 +235,7 @@ export default function AdminCakeFace() {
       <Head>
         <title>Admin</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href={icon} />
       </Head>
       <main>
         <Box

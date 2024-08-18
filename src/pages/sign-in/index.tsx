@@ -15,7 +15,7 @@ export const getServerSideProps = (async ({ locale }) => {
 
 const ViewSignIn = dynamic(() => import('@/views/SignIn'), {
   suspense: true,
-  ssr: false,
+  ssr: true,
 })
 
 const SignIn: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = (props) => {

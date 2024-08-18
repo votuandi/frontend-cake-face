@@ -27,8 +27,6 @@ formDataAxios.interceptors.request.use(
       }
       case 'POST': {
         if (!(req.data instanceof FormData) && !!req.data) {
-          console.log('req.data', req.data)
-
           req.data = commonHelpers.formatFormData(req.data)
         }
 
@@ -67,7 +65,6 @@ formDataAxios.interceptors.response.use(
           refreshTokenPromise = axios
             .post(`${commonConfig.API_HOST}/auth/refresh`, { refreshToken })
             .then(({ data }) => {
-              console.log('REFRESH DATA', data)
 
               // Update cookies with new tokens
               setCookie(COOKIE_ACCESS_TOKEN, data.accessToken, { maxAge: MAX_AGE })

@@ -18,9 +18,10 @@ import 'aos/dist/aos.css'
 import AOS from 'aos'
 import { CssBaseline, ThemeProvider } from '@mui/material'
 import theme from '@/assets/theme/theme.default'
-import { Provider } from 'react-redux'
+import { Provider, useDispatch } from 'react-redux'
 import store from '@/store'
 import useAuth from '@/hooks/useAuth'
+import { getSettings } from '@/store/setting/setting.action'
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (

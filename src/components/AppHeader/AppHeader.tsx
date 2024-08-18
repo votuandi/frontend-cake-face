@@ -13,6 +13,7 @@ import { useIsMounted } from 'usehooks-ts'
 import { getCurrentUserInfo } from '@/store/user/user.action'
 import { cleanCookie } from '@/utils/helpers/cookie'
 import Link from 'next/link'
+import { getSettings } from '@/store/setting/setting.action'
 
 type IProps = {}
 
@@ -22,9 +23,11 @@ const AppHeader = (props: IProps, ref: React.ForwardedRef<any>) => {
   const router = useRouter()
   const dispatch = useDispatch()
   const { currentUserInfo } = useSelector((state: RootState) => state.user)
+  const { settings } = useSelector((state: RootState) => state.setting)
 
   const [searchKey, setSearchKey] = useState<string>('')
   const [isTransparent, setTransparent] = useState<boolean>(true)
+  const [fullLogo, setFullLogo] = useState<string>('')
 
   const handleSignOut = () => {
     cleanCookie()
@@ -51,8 +54,6 @@ const AppHeader = (props: IProps, ref: React.ForwardedRef<any>) => {
   })
 
   const handleScroll = () => {
-    console.log(window.scrollY)
-
     if (window.scrollY > 50) {
       setTransparent(false)
     } else {
@@ -72,6 +73,16 @@ const AppHeader = (props: IProps, ref: React.ForwardedRef<any>) => {
       dispatch(getCurrentUserInfo())
     }
   }, [])
+
+  useEffect(() => {
+    dispatch(getSettings())
+  }, [dispatch])
+
+  useEffect(() => {
+    let _logo = settings.findLast((x) => x.name === 'full_logo')
+    if (!!_logo) setFullLogo(_logo.value)
+    else setFullLogo('')
+  }, [settings])
 
   let isMounted = useIsMounted()
 
@@ -98,7 +109,7 @@ const AppHeader = (props: IProps, ref: React.ForwardedRef<any>) => {
         <Grid container sx={{ width: '100%', height: '100%' }}>
           <Grid item xs={3} md={2} sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'start', alignItems: 'center', '& img': { width: '80%', maxWidth: '110px' } }}>
             <Link href={'/'}>
-              <img src="/image/abaso-full-logo.png" alt="" />
+              <img src={fullLogo} alt="" />
             </Link>
           </Grid>
           <Grid item xs={9} md={10} sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'end', alignItems: 'center' }}>

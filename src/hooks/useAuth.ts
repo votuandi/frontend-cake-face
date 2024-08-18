@@ -4,7 +4,7 @@ import Cookies from 'universal-cookie'
 import { Role } from '@/utils/api/auth'
 import { COOKIE_ACCESS_TOKEN, COOKIE_REFRESH_TOKEN, COOKIE_USER_ROLE } from '@/utils/constants/cookie.constant'
 
-const PUBLIC_PAGES = ['/', '/sign-in']
+const PUBLIC_PAGES = ['/', '/sign-in', '/sample/create']
 
 const rolePermissions: Record<Role, string[]> = {
   admin: ['/admin', ...PUBLIC_PAGES, '/account'], // admin can access all pages
@@ -36,8 +36,6 @@ const useAuth = () => {
     if (!accessToken || !refreshToken || !userRole) {
       // No tokens, user is not logged in
       if (!PUBLIC_PAGES.includes(router.pathname)) {
-        console.log(1)
-
         if (confirm('Bạn không có quyền truy cập trang này. Vui lòng đăng nhập!')) router.push('/sign-in')
         else router.push('/')
       }

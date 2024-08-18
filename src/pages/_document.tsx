@@ -26,10 +26,13 @@ export default class MyDocument extends Document {
               `,
             }}
           />
-          <link
+          {/* <link
             href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
             rel="stylesheet"
-          ></link>
+          ></link> */}
+          <link rel="preconnect" href="https://fonts.googleapis.com"></link>
+          <link rel="preconnect" href="https://fonts.gstatic.com" {...({ crossOrigin: "anonymous" } as React.LinkHTMLAttributes<HTMLLinkElement>)}></link>
+          <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&family=Baloo+Bhaijaan+2:wght@400..800&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Dancing+Script:wght@400..700&family=Danfo&family=Gluten:wght@100..900&family=Grandstander:ital,wght@0,100..900;1,100..900&family=Grenze+Gotisch:wght@100..900&family=Jaro:opsz@6..72&family=Lemonada:wght@300..700&family=Merienda:wght@300..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Oswald:wght@200..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Playfair:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&family=Roboto+Slab:wght@100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Sansita+Swashed:wght@300..900&family=Shantell+Sans:ital,wght@0,300..800;1,300..800&family=Tektur:wght@400..900&display=swap" rel="stylesheet"></link>
           <script async src="https://www.googletagmanager.com/gtag/js?id=G-HCENFPBJ0F"></script>
           <script
             id="gtag-init"

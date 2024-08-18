@@ -19,7 +19,6 @@ let refreshTokenPromise: any = null
 jsonAxios.interceptors.request.use(
   (req) => {
     const accessToken = cookies.get(COOKIE_ACCESS_TOKEN)
-    console.log(accessToken)
 
     if (accessToken) {
       req.headers.Authorization = `Bearer ${accessToken}`
@@ -68,7 +67,6 @@ jsonAxios.interceptors.response.use(
           refreshTokenPromise = axios
             .post(`${commonConfig.API_HOST}/auth/refresh`, { refreshToken })
             .then(({ data }) => {
-              console.log('REFRESH DATA', data)
 
               // Update cookies with new tokens
               setCookie(COOKIE_ACCESS_TOKEN, data.accessToken, { maxAge: MAX_AGE })

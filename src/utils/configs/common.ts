@@ -1,4 +1,4 @@
-export const DOCUMENT_TITLE = 'CAKE FACE | by ABASO'
+export const DOCUMENT_TITLE = 'Tìm Bánh | by ABASO'
 export const APP_VERSION = '0.0.1'
 export const APP_NAME = 'app'
 export const DEFAULT_GMT = '+07:00'

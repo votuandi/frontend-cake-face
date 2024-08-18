@@ -4,26 +4,7 @@ import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import { useIsMounted, useOnClickOutside } from 'usehooks-ts'
 import useStyles from './AdminCategory.style'
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Container,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  FormControl,
-  FormLabel,
-  Grid,
-  Pagination,
-  Switch,
-  TextField,
-  Typography,
-  useMediaQuery,
-} from '@mui/material'
-import AppAdminMenu from '@/components/AppAdminMenu'
+import { Box, Button, CircularProgress, Container, FormControl, FormLabel, Grid, Pagination, Switch, TextField, Typography, useMediaQuery } from '@mui/material'
 import Head from 'next/head'
 import { categoryApi } from '@/utils/api'
 import { CATEGORY_ITEM_TYPE, UPDATE_CATEGORY_DTO } from '@/utils/api/category'
@@ -33,10 +14,10 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import CancelIcon from '@mui/icons-material/Cancel'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import theme from '@/assets/theme'
-import MenuIcon from '@mui/icons-material/Menu'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/store/rootReducer'
 import { getCategoryList } from '@/store/category/category.action'
+import { getSettings } from '@/store/setting/setting.action'
 
 export default function AdminCategory() {
   const { t, i18n } = useTranslation()
@@ -46,7 +27,11 @@ export default function AdminCategory() {
   const dispatch = useDispatch()
   const { categoryList, categoryListError, categoryListLoading, categoryTotalPage, categoryTotalPageActive } = useSelector((state: RootState) => state.category)
   console.log(categoryList)
+  const { settings } = useSelector((state: RootState) => state.setting)
 
+  const [icon, setIcon] = useState<string>('')
+  const [logo, setLogo] = useState<string>('')
+  const [seoContent, setSeoContent] = useState<string>('')
   const [isShowMenu, setIsShowMenu] = useState<boolean>(false)
   const [editIndex, setEditIndex] = useState<number>(-1)
   const [editActive, setEditActive] = useState<boolean>(true)
@@ -210,6 +195,7 @@ export default function AdminCategory() {
 
   let FetchData = async () => {
     await GetCategoryList()
+    dispatch(getSettings())
   }
 
   let closeMenuPopup = () => {
@@ -233,6 +219,14 @@ export default function AdminCategory() {
     GetCategoryList()
   }, [page, search])
 
+  useEffect(() => {
+    settings.forEach((x) => {
+      if (x.name === 'seo_content') setSeoContent(x.value)
+      if (x.name === 'ico_logo') setIcon(x.value)
+      if (x.name === 'full_logo') setLogo(x.value)
+    })
+  }, [settings])
+
   const { classes } = useStyles({ params: {} })
   let isMounted = useIsMounted()
 
@@ -241,7 +235,7 @@ export default function AdminCategory() {
       <Head>
         <title>Admin</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href={icon} />
       </Head>
       <main>
         <Box

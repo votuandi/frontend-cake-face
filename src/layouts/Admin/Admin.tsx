@@ -3,7 +3,6 @@ import useStyles from './Admin.styles'
 import { Box, Button, CircularProgress, useMediaQuery } from '@mui/material'
 import AppAdminMenu from '@/components/AppAdminMenu'
 import theme from '@/assets/theme'
-
 type MainProps = {
   children: React.ReactNode
 }
@@ -15,6 +14,7 @@ const Main = (props: MainProps) => {
   const { classes } = useStyles({
     params: {},
   })
+
 
   return (
     <Box

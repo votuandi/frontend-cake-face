@@ -113,3 +113,10 @@ body {
   -webkit-box-orient: vertical;
   word-break: word;
 }
+
+a {
+  text-decoration: none;
+}
+.link {
+  color: '#fff';
+}

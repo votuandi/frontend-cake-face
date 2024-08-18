@@ -62,3 +62,12 @@ export const CAKE_FACE_SORT_LIST: Array<{ title: string; value: SORT_BY_TYPE }> 
 ]
 
 export type ROLE_TYPE = 'admin' | 'client' | 'user'
+
+export const FONTS = [
+  'Baloo 2', 'Baloo Bhaijaan 2', 'Cormorant', 'Danfo', 'Dancing Script', 'Gluten',
+  'Grandstander', 'Grenze Gotisch', 'Jaro', 'Lemonada', 'Merienda', 'Open Sans', 
+  'Oswald', 'Playfair', 'Playfair Display', 'Roboto', 'Roboto Slab', 
+  'Sansita Swashed', 'Shantell Sans', 'Tektur'
+]
+
+export const TEXT_SIZE = [1,2,4,6,8,9,10,12,14,16,18,20,24,28,32,36,40,48,56,64,72,80,100]

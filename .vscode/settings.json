@@ -1,0 +1,11 @@
+{
+  "editor.fontFamily": "Fira Code, 'Cascadia Code', Fira Code, Jetbrains Mono, SF Mono, Consolas, 'Courier New', monospace",
+  "editor.fontLigatures": true,
+  "editor.fontWeight": 355,
+  "editor.fontSize": 14,
+  "editor.colorDecorators": true,
+  "editor.defaultColorDecorators": true,
+  "explorer.compactFolders": false,
+  "terminal.integrated.fontFamily": "MesloLGS NF",
+  "editor.formatOnSave": true,
+}

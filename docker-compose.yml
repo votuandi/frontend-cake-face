@@ -1,10 +1,10 @@
 version: '3'
 services:
-    kyanhnguyen-nginx:
+    timbanh-nginx:
         ports:
             - "80:80"
             - "443:443"
-        container_name: kyanhnguyen-nginx
+        container_name: timbanh-nginx
         restart: always
         image: nginx:latest
         volumes:
@@ -12,18 +12,19 @@ services:
             - ./private.key:/etc/nginx/ssl/private.key
             - ./bundle.crt:/etc/nginx/ssl/bundle.crt
         links:
-            - kyanhnguyen-web
+            - timbanh-web
         deploy:
             resources:
                 limits:
                     cpus: '0.5'
                     memory: 512M
-    kyanhnguyen-web:
-        container_name: kyanhnguyen-web
+    timbanh-web:
+        container_name: timbanh-web
         restart: always
-        image: kyanhnguyen-web-img:1.0.0
+        image: timbanh-web-img:1.0.0
         deploy:
             resources:
                 limits:
                     cpus: '0.5'
                     memory: 512M
+

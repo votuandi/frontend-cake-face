@@ -20,7 +20,7 @@ type CakeFaceProps = {
 
 const CakeFaceSlug = dynamic(() => import('@/views/CakeFace'), {
   suspense: true,
-  ssr: false,
+  ssr: true,
 })
 
 const CakeFace: NextPageWithLayout<CakeFaceProps> = () => {

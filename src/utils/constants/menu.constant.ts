@@ -9,23 +9,31 @@ export const ADMIN_MENU = [
     path: '/banner',
   },
   {
-    title: 'Category',
+    title: 'Loại bánh',
     path: '/category',
   },
   {
-    title: 'Cake Face',
+    title: 'Mẫu bánh',
     path: '/cake-face',
   },
   {
-    title: 'Trendy',
+    title: 'Hot trend',
     path: '/trendy',
   },
   {
-    title: 'Store',
+    title: 'Tạo mẫu',
+    path: '/sample',
+  },
+  {
+    title: 'Cửa hàng',
     path: '/store',
   },
   {
-    title: 'Account',
+    title: 'Tài khoản',
     path: '/account',
+  },
+  {
+    title: 'Thiết lập web',
+    path: '/setting',
   },
 ]
