@@ -13,13 +13,14 @@ type IProps = {}
 const AppFooter = (props: IProps, ref: React.ForwardedRef<any>) => {
   const { t, i18n } = useTranslation()
   const { classes } = useStyles()
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down(600))
+  const isMd = useMediaQuery(theme.breakpoints.down(900))
+  const isSm = useMediaQuery(theme.breakpoints.down(600))
 
   return (
     <Box
       sx={{
         width: '100vw',
-        padding: isSmallScreen ? '16px 16px 80px 16px' : '60px 40px 80px 40px',
+        padding: isMd ? '16px 16px 80px 16px' : '60px 40px 80px 40px',
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
@@ -31,8 +32,9 @@ const AppFooter = (props: IProps, ref: React.ForwardedRef<any>) => {
       <Grid container sx={{ width: '100%', maxWidth: '1200px' }}>
         <Grid
           item
-          xs={12}
-          md={3}
+          // xs={12}
+          // md={3}
+          xs={3}
           sx={{
             display: 'flex',
             justifyContent: 'center',
@@ -48,15 +50,21 @@ const AppFooter = (props: IProps, ref: React.ForwardedRef<any>) => {
         </Grid>
         <Grid
           item
-          xs={12}
-          md={9}
+          // xs={12}
+          // md={9}
+          xs={9}
           sx={{
             color: '#fff',
-            fontSize: isSmallScreen ? '20px' : '36px',
-            padding: isSmallScreen ? '12px 0' : '56px 0 0 12px',
+            fontSize: isSm ? '14px' : isMd ? '24px' : '36px',
+            // padding: isMd ? '12px 0' : '56px 0 0 12px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'start',
+            paddingLeft: '12px',
             '& p': {
-              paddingBottom: '12px',
-              borderBottom: '2px solid #fff',
+              paddingBottom: isSm ? '6px' : '12px',
+              borderBottom: isSm ? '1px solid #fff' : '2px solid #fff',
             },
           }}
         >
@@ -69,7 +77,7 @@ const AppFooter = (props: IProps, ref: React.ForwardedRef<any>) => {
           xs={4}
           sx={{
             fontWeight: 600,
-            fontSize: isSmallScreen ? '20px' : '36px',
+            fontSize: isSm ? '14px' : isMd ? '20px' : '36px',
             textDecoration: 'none',
             display: 'flex',
             justifyContent: 'center',
@@ -84,7 +92,7 @@ const AppFooter = (props: IProps, ref: React.ForwardedRef<any>) => {
           xs={4}
           sx={{
             fontWeight: 600,
-            fontSize: isSmallScreen ? '20px' : '36px',
+            fontSize: isSm ? '14px' : isMd ? '20px' : '36px',
             textDecoration: 'none',
             display: 'flex',
             justifyContent: 'center',
@@ -99,7 +107,7 @@ const AppFooter = (props: IProps, ref: React.ForwardedRef<any>) => {
           xs={4}
           sx={{
             fontWeight: 600,
-            fontSize: isSmallScreen ? '20px' : '36px',
+            fontSize: isSm ? '14px' : isMd ? '20px' : '36px',
             textDecoration: 'none',
             display: 'flex',
             justifyContent: 'center',
@@ -114,12 +122,13 @@ const AppFooter = (props: IProps, ref: React.ForwardedRef<any>) => {
           item
           xs={12}
           sx={{
-            padding: isSmallScreen ? '8px' : '20px',
+            padding: isMd ? '8px' : '20px',
             margin: '20px 0',
             borderRadius: '12px',
             backgroundColor: '#ccebe5',
             color: '#34a199',
-            fontSize: '20px',
+            fontSize: isSm ? '14px' : '20px',
+            lineHeight: 1.3,
             textAlign: 'justify',
           }}
         >

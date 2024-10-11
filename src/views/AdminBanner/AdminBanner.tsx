@@ -206,7 +206,7 @@ export default function AdminBanner() {
                         sx={{
                           width: '100%',
                           borderRadius: '8px',
-                          backgroundImage: `url(${banner.path.includes('\\') ? banner.path.replaceAll('\\', '/') : banner.path})`,
+                          backgroundImage: `url(${encodeURI(banner.path.includes('\\') ? banner.path.replaceAll('\\', '/') : banner.path)})`,
                           aspectRatio: isLongerRatio ? 16 / 9 : 4 / 3,
                           backgroundRepeat: 'no-repeat',
                           backgroundPosition: 'center',

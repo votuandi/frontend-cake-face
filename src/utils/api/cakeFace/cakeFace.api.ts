@@ -25,6 +25,14 @@ const cakeFaceApi = {
     })
   },
 
+  riseView: (id: string) => {
+    return jsonAxios.put<AxiosResponseData>(`/cake-face/${id}/rise-view`)
+  },
+
+  riseDownload: (id: string) => {
+    return jsonAxios.put<AxiosResponseData>(`/cake-face/${id}/rise-download`)
+  },
+
   deleteById: (id: string) => {
     return jsonAxios.delete<AxiosResponseData>(`/cake-face/${id}`)
   },

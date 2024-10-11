@@ -2,7 +2,7 @@ import jsonAxios from '@/utils/axios/json.axios'
 import formDataAxios from '@/utils/axios/form-data.axios'
 import type { AxiosResponseData } from '@/utils/axios'
 import { parseParams } from '@/utils/helpers/common'
-import { CREATE_SAMPLE_DTO, GET_SAMPLE_LIST_PAYLOAD, UPDATE_SAMPLE_DTO } from './sample.api.types'
+import { CREATE_SAMPLE_DTO, GET_SAMPLE_LIST_PAYLOAD, HTML_TO_IMAGE_DTO, UPDATE_SAMPLE_DTO } from './sample.api.types'
 
 const sampleApi = {
   getSampleBackgroundList: (payload: GET_SAMPLE_LIST_PAYLOAD) => {
@@ -51,6 +51,12 @@ const sampleApi = {
 
   deleteSamplePatternById: (id: string) => {
     return jsonAxios.delete<AxiosResponseData>(`/sample-pattern/${id}`)
+  },
+
+  htmlToImage: (payload: HTML_TO_IMAGE_DTO) => {
+    return jsonAxios.post<AxiosResponseData>('/sample-pattern/download-sample/', {
+      ...payload.params,
+    })
   },
 }
 export default sampleApi

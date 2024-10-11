@@ -5,7 +5,24 @@ import { useRouter } from 'next/router'
 import { useIsMounted } from 'usehooks-ts'
 // import Slider from 'react-slick'
 import useStyles from './CreateSample.style'
-import { Box, Button, Container, FormControl, Grid, InputLabel, LinearProgress, MenuItem, Select, SelectChangeEvent, Slider, Tab, Tabs, TextField, Typography } from '@mui/material'
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Container,
+  FormControl,
+  Grid,
+  InputLabel,
+  LinearProgress,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Slider,
+  Tab,
+  Tabs,
+  TextField,
+  Typography,
+} from '@mui/material'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/store/rootReducer'
 import { getSampleBackgroundList, getSamplePatternList } from '@/store/sample/sample.action'
@@ -20,6 +37,8 @@ import { createGlobalStyle } from 'styled-components'
 import QRCode from 'react-qr-code'
 import { getSettings } from '@/store/setting/setting.action'
 import Head from 'next/head'
+import { sampleApi } from '@/utils/api'
+import { commonConfig } from '@/utils/configs'
 
 export default function CreateSample() {
   const { t, i18n } = useTranslation()
@@ -75,9 +94,12 @@ export default function CreateSample() {
   const [spY_4, setSpY_4] = useState<number>(0)
   const [spTabIndex, setSpTabIndex] = useState<number>(0)
 
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
   const [icon, setIcon] = useState<string>('')
   const [logo, setLogo] = useState<string>('')
   const [seoContent, setSeoContent] = useState<string>('')
+  // const [imageUrl, setImageUrl] = useState<string | null>(null)
 
   const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&family=Baloo+Bhaijaan+2:wght@400..800&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Dancing+Script:wght@400..700&family=Danfo&family=Gluten:wght@100..900&family=Grandstander:ital,wght@0,100..900;1,100..900&family=Grenze+Gotisch:wght@100..900&family=Jaro:opsz@6..72&family=Lemonada:wght@300..700&family=Merienda:wght@300..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Oswald:wght@200..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Playfair:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&family=Roboto+Slab:wght@100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Sansita+Swashed:wght@300..900&family=Shantell+Sans:ital,wght@0,300..800;1,300..800&family=Tektur:wght@400..900&display=swap');
@@ -145,13 +167,157 @@ export default function CreateSample() {
     if (workspaceRef.current === null) return
 
     try {
-      const dataUrl = await toPng(workspaceRef.current)
-      const link = document.createElement('a')
-      link.href = dataUrl
-      link.download = 'maubanh-timbanh.com.png'
-      link.click()
+      setIsLoading(true)
+      let htmlContent = `<html>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&family=Baloo+Bhaijaan+2:wght@400..800&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Dancing+Script:wght@400..700&family=Danfo&family=Gluten:wght@100..900&family=Grandstander:ital,wght@0,100..900;1,100..900&family=Grenze+Gotisch:wght@100..900&family=Jaro:opsz@6..72&family=Lemonada:wght@300..700&family=Merienda:wght@300..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Oswald:wght@200..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Playfair:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&family=Roboto+Slab:wght@100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Sansita+Swashed:wght@300..900&family=Shantell+Sans:ital,wght@0,300..800;1,300..800&family=Tektur:wght@400..900&display=swap" rel="stylesheet">
+      </head>
+      <body>
+        <div
+          style="
+            height: ${workspaceRef.current.offsetHeight * 2}px;
+            aspect-ratio: 1;
+            padding: 30px;
+            background-color: #fff;
+            position: relative;
+          "
+        >
+          <div
+            style="
+              width: ${workspaceRef.current.offsetHeight * 2}px;
+              height: ${workspaceRef.current.offsetHeight * 2}px;
+              position: absolute;
+              z-index: 10;
+              background-image: url(${encodeURI(sampleBackgroundList[selectedSB]?.image)});
+              background-position: center;
+              background-size: ${zoomSB * 10}% ${zoomSB * 10}%;
+              background-repeat: no-repeat;
+              top: 0;
+              left: 0;
+            "
+          ></div>
+          <div
+            style="
+              width: ${workspaceRef.current.offsetHeight * 2}px;
+              height: ${workspaceRef.current.offsetHeight * 2}px;
+              position: absolute;
+              z-index: 11;
+              background-image: url(${encodeURI(samplePatternList[selectedSP_1]?.image)});
+              background-position: ${50 + spX_1}% ${50 + spY_1}%;
+              background-size: ${zoomSP_1 * 10}% ${zoomSP_1 * 10}%;
+              background-repeat: no-repeat;
+              top: 0;
+              left: 0;
+            "
+          ></div>
+          <div
+            style="
+              width: ${workspaceRef.current.offsetHeight * 2}px;
+              height: ${workspaceRef.current.offsetHeight * 2}px;
+              position: absolute;
+              z-index: 11;
+              background-image: url(${encodeURI(samplePatternList[selectedSP_2]?.image)});
+              background-position: ${50 + spX_2}% ${50 + spY_2}%;
+              background-size: ${zoomSP_2 * 10}% ${zoomSP_2 * 10}%;
+              background-repeat: no-repeat;
+              top: 0;
+              left: 0;
+            "
+          ></div>
+
+          <div
+            style="
+              width: ${workspaceRef.current.offsetHeight * 2}px;
+              height: ${workspaceRef.current.offsetHeight * 2}px;
+              position: absolute;
+              z-index: 11;
+              background-image: url(${encodeURI(samplePatternList[selectedSP_3]?.image)});
+              background-position: ${50 + spX_3}% ${50 + spY_3}%;
+              background-size: ${zoomSP_3 * 10}% ${zoomSP_3 * 10}%;
+              background-repeat: no-repeat;
+              top: 0;
+              left: 0;
+            "
+          ></div>
+
+          <div
+            style="
+              width: ${workspaceRef.current.offsetHeight * 2}px;
+              height: ${workspaceRef.current.offsetHeight * 2}px;
+              position: absolute;
+              z-index: 11;
+              background-image: url(${encodeURI(samplePatternList[selectedSP_4]?.image)});
+              background-position: ${50 + spX_4}% ${50 + spY_4}%;
+              background-size: ${zoomSP_4 * 10}% ${zoomSP_4 * 10}%;
+              background-repeat: no-repeat;
+              top: 0;
+              left: 0;
+            "
+          ></div>
+
+          <span
+            style="
+              width: ${workspaceRef.current.offsetHeight * 2}px;
+              color: ${textColor};
+              font-family: ${selectedFont};
+              font-size: ${textSize * 2}px;
+              font-weight: ${isBold ? 700 : 400};
+              font-style: ${isItalic ? 'italic' : 'normal'};
+              text-decoration: ${isUnderline ? 'underline' : 'none'};
+              position: absolute;
+              top: ${textX * 2};
+              left: ${textY * 2};
+              text-align: center;
+              white-space: pre-line;
+              z-index: 12;
+            "
+          >${text}</span>
+        </div>
+      </body>
+    </html>`
+
+      console.log(htmlContent)
+
+      const response = await fetch(`${commonConfig.API_HOST}/sample-pattern/download-sample/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content: htmlContent, size: workspaceRef.current.offsetHeight * 2 }),
+      })
+
+      // const response = await fetch(`/api/generate-image`, {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({ htmlContent }),
+      // })
+
+      console.log(response)
+
+      if (response.status) {
+        const blob = await response.blob()
+        const url = URL.createObjectURL(blob)
+        console.log(url)
+
+        // setImageUrl(url)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = 'maubanh-timbanh.com.png'
+        link.click()
+        setIsLoading(false)
+      } else {
+        alert('Tải ảnh thất bại')
+        console.error('Failed to generate image')
+        setIsLoading(false)
+      }
     } catch (error) {
+      alert('Tải ảnh thất bại')
       console.error('Error capturing content:', error)
+      setIsLoading(false)
     }
   }
 
@@ -159,7 +325,12 @@ export default function CreateSample() {
     if (qrRef.current === null) return
 
     try {
-      const spToText = `${samplePatternList[selectedSP_1].id}_${zoomSP_1}_${spX_1}_${spY_1}_${samplePatternList[selectedSP_2].id}_${zoomSP_2}_${spX_2}_${spY_2}_${samplePatternList[selectedSP_3].id}_${zoomSP_3}_${spX_3}_${spY_3}_${samplePatternList[selectedSP_4].id}_${zoomSP_4}_${spX_4}_${spY_4}`
+      setIsLoading(true)
+      const spToText = `${samplePatternList[selectedSP_1]?.id ? samplePatternList[selectedSP_1].id : 'null'}_${zoomSP_1}_${spX_1}_${spY_1}_${
+        samplePatternList[selectedSP_2]?.id ? samplePatternList[selectedSP_2].id : 'null'
+      }_${zoomSP_2}_${spX_2}_${spY_2}_${samplePatternList[selectedSP_3]?.id ? samplePatternList[selectedSP_3].id : 'null'}_${zoomSP_3}_${spX_3}_${spY_3}_${
+        samplePatternList[selectedSP_4]?.id ? samplePatternList[selectedSP_4].id : 'null'
+      }_${zoomSP_4}_${spX_4}_${spY_4}`
 
       setSampleUrl(
         `https://www.timbanh.com/sample/create?sample=${sampleBackgroundList[selectedSB].id}_${zoomSB}_${spToText}&text=${encodeURIComponent(text)}&style=${textSize}_${
@@ -172,7 +343,9 @@ export default function CreateSample() {
       link.href = dataUrl
       link.download = 'qr-maubanh-timbanh.com.png'
       link.click()
+      setIsLoading(false)
     } catch (error) {
+      setIsLoading(false)
       console.error('Error capturing content:', error)
     }
   }
@@ -198,48 +371,76 @@ export default function CreateSample() {
             setZoomSB(Number(sampleProps[1]))
           }
 
-          let indexSP_1 = samplePatternList.map((x) => x.id.toString()).indexOf(sampleProps[2])
-          if (indexSP_1 === -1) {
-            alert('Mẫu bánh không còn tồn tại. Error: 3')
-            return
-          } else {
-            setSelectedSP_1(indexSP_1)
+          if (sampleProps[2] === 'null') {
+            setSelectedSP_1(-1)
             setZoomSP_1(Number(sampleProps[3]))
             setSpX_1(Number(sampleProps[4]))
             setSpY_1(Number(sampleProps[5]))
+          } else {
+            let indexSP_1 = samplePatternList.map((x) => x.id.toString()).indexOf(sampleProps[2])
+            if (indexSP_1 === -1) {
+              alert('Mẫu bánh không còn tồn tại. Error: 3')
+              return
+            } else {
+              setSelectedSP_1(indexSP_1)
+              setZoomSP_1(Number(sampleProps[3]))
+              setSpX_1(Number(sampleProps[4]))
+              setSpY_1(Number(sampleProps[5]))
+            }
           }
 
-          let indexSP_2 = samplePatternList.map((x) => x.id.toString()).indexOf(sampleProps[6])
-          if (indexSP_2 === -1) {
-            alert('Mẫu bánh không còn tồn tại. Error: 4')
-            return
-          } else {
-            setSelectedSP_2(indexSP_2)
+          if (sampleProps[6] === 'null') {
+            setSelectedSP_2(-1)
             setZoomSP_2(Number(sampleProps[7]))
             setSpX_2(Number(sampleProps[8]))
             setSpY_2(Number(sampleProps[9]))
+          } else {
+            let indexSP_2 = samplePatternList.map((x) => x.id.toString()).indexOf(sampleProps[6])
+            if (indexSP_2 === -1) {
+              alert('Mẫu bánh không còn tồn tại. Error: 4')
+              return
+            } else {
+              setSelectedSP_2(indexSP_2)
+              setZoomSP_2(Number(sampleProps[7]))
+              setSpX_2(Number(sampleProps[8]))
+              setSpY_2(Number(sampleProps[9]))
+            }
           }
 
-          let indexSP_3 = samplePatternList.map((x) => x.id.toString()).indexOf(sampleProps[10])
-          if (indexSP_3 === -1) {
-            alert('Mẫu bánh không còn tồn tại. Error: 5')
-            return
-          } else {
-            setSelectedSP_3(indexSP_3)
+          if (sampleProps[10] === 'null') {
+            setSelectedSP_3(-1)
             setZoomSP_3(Number(sampleProps[11]))
             setSpX_3(Number(sampleProps[12]))
             setSpY_3(Number(sampleProps[13]))
+          } else {
+            let indexSP_3 = samplePatternList.map((x) => x.id.toString()).indexOf(sampleProps[10])
+            if (indexSP_3 === -1) {
+              alert('Mẫu bánh không còn tồn tại. Error: 5')
+              return
+            } else {
+              setSelectedSP_3(indexSP_3)
+              setZoomSP_3(Number(sampleProps[11]))
+              setSpX_3(Number(sampleProps[12]))
+              setSpY_3(Number(sampleProps[13]))
+            }
           }
 
-          let indexSP_4 = samplePatternList.map((x) => x.id.toString()).indexOf(sampleProps[14])
-          if (indexSP_4 === -1) {
-            alert('Mẫu bánh không còn tồn tại. Error: 6')
-            return
-          } else {
-            setSelectedSP_4(indexSP_4)
+          if (sampleProps[14] === 'null') {
+            setSelectedSP_4(-1)
             setZoomSP_4(Number(sampleProps[15]))
             setSpX_4(Number(sampleProps[16]))
             setSpY_4(Number(sampleProps[17]))
+          } else {
+            let indexSP_4 = samplePatternList.map((x) => x.id.toString()).indexOf(sampleProps[14])
+            if (indexSP_4 === -1) {
+              alert('Mẫu bánh không còn tồn tại. Error: 6')
+              return
+            } else {
+              setSelectedSP_4(indexSP_4)
+              setZoomSP_4(Number(sampleProps[15]))
+              setSpX_4(Number(sampleProps[16]))
+              setSpY_4(Number(sampleProps[17]))
+            }
           }
         }
 
@@ -311,7 +512,7 @@ export default function CreateSample() {
           width: '100%',
           height: '100%',
           position: 'relative',
-          padding: '16px 0',
+          padding: '100px 0 16px 0',
           backgroundColor: 'white',
         }}
       >
@@ -328,16 +529,16 @@ export default function CreateSample() {
             fontFamily: 'Open Sans',
           }}
         >
-          <Box
+          <div
             ref={workspaceRef}
-            sx={{
+            style={{
               width: '100%',
               maxWidth: '520px',
-              bgcolor: '#6abcb6',
+              backgroundColor: '#6abcb6',
             }}
           >
-            <Box
-              sx={{
+            <div
+              style={{
                 margin: '0 auto',
                 height: '100%',
                 maxHeight: '400px',
@@ -347,78 +548,81 @@ export default function CreateSample() {
               }}
             >
               <GlobalStyle />
-              <Box
-                sx={{
+              <div
+                style={{
                   width: '100%',
                   height: '100%',
                   position: 'absolute',
                   zIndex: 10,
-                  backgroundImage: `url(${sampleBackgroundList[selectedSB]?.image})`,
+                  backgroundImage: `url("${encodeURI(sampleBackgroundList[selectedSB]?.image)}")`,
                   backgroundPosition: 'center',
-                  // backgroundSize: 'cover',
                   backgroundSize: `${zoomSB * 10}% ${zoomSB * 10}%`,
                   backgroundRepeat: 'no-repeat',
+                  top: 0,
+                  left: 0,
                 }}
-              ></Box>
-              <Box
-                sx={{
+              ></div>
+              <div
+                style={{
                   width: '100%',
                   height: '100%',
                   position: 'absolute',
                   zIndex: 11,
-                  backgroundImage: `url(${samplePatternList[selectedSP_1]?.image})`,
+                  backgroundImage: `url(${encodeURI(samplePatternList[selectedSP_1]?.image)})`,
                   backgroundPosition: `${50 + spX_1}% ${50 + spY_1}%`,
-                  // backgroundSize: 'cover',
                   backgroundSize: `${zoomSP_1 * 10}% ${zoomSP_1 * 10}%`,
                   backgroundRepeat: 'no-repeat',
+                  top: 0,
+                  left: 0,
                 }}
-              ></Box>
-
-              <Box
-                sx={{
+              ></div>
+              <div
+                style={{
                   width: '100%',
                   height: '100%',
-                  position: 'absolute',
+                  position: 'relative',
                   zIndex: 11,
-                  backgroundImage: `url(${samplePatternList[selectedSP_2]?.image})`,
+                  backgroundImage: `url(${encodeURI(samplePatternList[selectedSP_2]?.image)})`,
                   backgroundPosition: `${50 + spX_2}% ${50 + spY_2}%`,
-                  // backgroundSize: 'cover',
                   backgroundSize: `${zoomSP_2 * 10}% ${zoomSP_2 * 10}%`,
                   backgroundRepeat: 'no-repeat',
+                  top: 0,
+                  left: 0,
                 }}
-              ></Box>
+              ></div>
 
-              <Box
-                sx={{
+              <div
+                style={{
                   width: '100%',
                   height: '100%',
                   position: 'absolute',
                   zIndex: 11,
-                  backgroundImage: `url(${samplePatternList[selectedSP_3]?.image})`,
+                  backgroundImage: `url(${encodeURI(samplePatternList[selectedSP_3]?.image)})`,
                   backgroundPosition: `${50 + spX_3}% ${50 + spY_3}%`,
-                  // backgroundSize: 'cover',
                   backgroundSize: `${zoomSP_3 * 10}% ${zoomSP_3 * 10}%`,
                   backgroundRepeat: 'no-repeat',
+                  top: 0,
+                  left: 0,
                 }}
-              ></Box>
+              ></div>
 
-              <Box
-                sx={{
+              <div
+                style={{
                   width: '100%',
                   height: '100%',
                   position: 'absolute',
                   zIndex: 11,
-                  backgroundImage: `url(${samplePatternList[selectedSP_4]?.image})`,
+                  backgroundImage: `url(${encodeURI(samplePatternList[selectedSP_4]?.image)})`,
                   backgroundPosition: `${50 + spX_4}% ${50 + spY_4}%`,
-                  // backgroundSize: 'cover',
                   backgroundSize: `${zoomSP_4 * 10}% ${zoomSP_4 * 10}%`,
                   backgroundRepeat: 'no-repeat',
+                  top: 0,
+                  left: 0,
                 }}
-              ></Box>
+              ></div>
 
-              <Typography
-                paragraph
-                sx={{
+              <span
+                style={{
                   width: '100%',
                   color: textColor,
                   fontFamily: selectedFont,
@@ -426,18 +630,18 @@ export default function CreateSample() {
                   fontWeight: isBold ? 700 : 400,
                   fontStyle: isItalic ? 'italic' : 'normal',
                   textDecoration: isUnderline ? 'underline' : 'none',
+                  textAlign: 'center',
                   position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: `translate(calc(-50% + ${textX}px), calc(-50% + ${textY}px))`,
+                  top: textX,
+                  left: textY,
                   whiteSpace: 'pre-line',
                   zIndex: 12,
                 }}
               >
                 {text}
-              </Typography>
-            </Box>
-          </Box>
+              </span>
+            </div>
+          </div>
           <Box
             sx={{
               width: '100%',
@@ -486,7 +690,7 @@ export default function CreateSample() {
                     xs={4}
                     key={index}
                     sx={{
-                      backgroundImage: `url(${item.image})`,
+                      backgroundImage: `url(${encodeURI(item.image)})`,
                       backgroundPosition: 'center',
                       backgroundSize: 'cover',
                       aspectRatio: 1,
@@ -546,7 +750,9 @@ export default function CreateSample() {
                         max={50}
                         onChange={handleChangeZoom}
                       />
-                      <Typography sx={{ width: '80px' }}>x {spTabIndex === 0 ? zoomSP_1 : spTabIndex === 1 ? zoomSP_2 : spTabIndex === 2 ? zoomSP_3 : zoomSP_4 / 10}</Typography>
+                      <Typography sx={{ width: '80px' }}>
+                        x {spTabIndex === 0 ? zoomSP_1 / 10 : spTabIndex === 1 ? zoomSP_2 / 10 : spTabIndex === 2 ? zoomSP_3 / 10 : zoomSP_4 / 10}
+                      </Typography>
                     </Box>
 
                     <Box
@@ -584,7 +790,7 @@ export default function CreateSample() {
                       xs={4}
                       key={index}
                       sx={{
-                        backgroundImage: `url(${item.image})`,
+                        backgroundImage: `url(${encodeURI(item.image)})`,
                         backgroundPosition: 'center',
                         backgroundSize: 'cover',
                         aspectRatio: 1,
@@ -708,7 +914,7 @@ export default function CreateSample() {
                       gap: '10px',
                     }}
                   >
-                    <Slider value={textX} min={-200} max={200} onChange={handleChangeTextX} />
+                    <Slider value={textX} min={0} max={workspaceRef?.current?.offsetHeight} onChange={handleChangeTextX} />
                     <Typography sx={{ width: '125px' }}>Tọa độ X: {textX}</Typography>
                   </Box>
                   <Box
@@ -721,7 +927,12 @@ export default function CreateSample() {
                       gap: '10px',
                     }}
                   >
-                    <Slider value={textY} min={-200} max={200} onChange={handleChangeTextY} />
+                    <Slider
+                      value={textY}
+                      min={workspaceRef?.current?.offsetHeight ? -workspaceRef?.current?.offsetHeight : 0}
+                      max={workspaceRef?.current?.offsetHeight}
+                      onChange={handleChangeTextY}
+                    />
                     <Typography sx={{ width: '125px' }}>Tọa độ Y: {textY}</Typography>
                   </Box>
                 </Box>
@@ -761,7 +972,20 @@ export default function CreateSample() {
                 {' '}
                 <PhotoIcon /> + <QrCode2Icon />
               </Button> */}
-
+                {/* <>
+                  <Box
+                    ref={qrRef}
+                    sx={{
+                      width: '100%',
+                      maxWidth: '800px',
+                      aspectRatio: 1,
+                      padding: '12px',
+                      backgroundColor: '#fff',
+                    }}
+                  >
+                    <img src={imageUrl ? imageUrl : ''} alt="Review" />
+                  </Box>
+                </> */}
                 <>
                   <Box
                     ref={qrRef}
@@ -780,6 +1004,24 @@ export default function CreateSample() {
             )}
           </Box>
         </Box>
+        {isLoading && (
+          <Box
+            sx={{
+              width: '100%',
+              height: '100%',
+              backgroundColor: '#00000080',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              zIndex: 91,
+            }}
+          >
+            <CircularProgress sx={{ width: '80px', height: '80px', color: '#26787c' }} />
+          </Box>
+        )}
       </Box>
     </>
   )

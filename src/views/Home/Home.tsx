@@ -4,7 +4,7 @@ import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import { useIsMounted } from 'usehooks-ts'
 import useStyles from './Home.style'
-import { Box, Button, Container, FormControl, Grid, InputLabel, MenuItem, Select, Typography, useMediaQuery } from '@mui/material'
+import { Box, Button, Container, FormControl, Grid, InputLabel, MenuItem, Pagination, Select, Typography, useMediaQuery } from '@mui/material'
 import AppBanner from '@/components/AppBanner'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/store/rootReducer'
@@ -39,7 +39,7 @@ export default function Home() {
   }
 
   const { categoryList } = useSelector((state: RootState) => state.category)
-  const { cakeFaceList, trendyCakeFaceList } = useSelector((state: RootState) => state.cakeFace)
+  const { cakeFaceList, cakeFaceListError, cakeFaceListLoading, cakeFaceTotalPage, cakeFaceTotalPageActive, trendyCakeFaceList } = useSelector((state: RootState) => state.cakeFace)
   const { settings } = useSelector((state: RootState) => state.setting)
 
   const [icon, setIcon] = useState<string>('')
@@ -49,16 +49,15 @@ export default function Home() {
   const [sortBy, setSortBy] = useState<SORT_BY_TYPE>('name')
   const [selectedName, setSelectedName] = useState<string>()
 
+  const [limit, setLimit] = useState<number>(20)
+  const [page, setPage] = useState<number>(1)
+
   let FetchData = async () => {
     dispatch(getCategoryList({ params: { isActive: '1' } }))
     dispatch(getTrendyCakeFaceList({ params: { isActive: '1', isTrendy: '1' } }))
     dispatch(getCakeFaceList({ params: { isActive: '1' } }))
     dispatch(getSettings())
   }
-
-  useEffect(() => {
-    console.log('trendyCakeFaceList', trendyCakeFaceList)
-  }, [trendyCakeFaceList])
 
   useEffect(() => {
     if (isMounted()) return
@@ -77,12 +76,15 @@ export default function Home() {
           categoryId: selectedCategoryId,
           sortBy,
           name: selectedName ? selectedName : '',
+          limit,
+          page,
         },
       })
     )
-  }, [selectedCategoryId, sortBy, selectedName])
+  }, [selectedCategoryId, sortBy, selectedName, page])
 
   useEffect(() => {
+    setPage(1)
     let _name = router.query['name']
 
     if (!!_name) {
@@ -144,7 +146,7 @@ export default function Home() {
                     sx={{
                       width: '100%',
                       aspectRatio: 1,
-                      backgroundImage: `url('${item?.thumbnail.replaceAll(/\\/g, '/')}')`,
+                      backgroundImage: `url("${item?.thumbnail ? encodeURI(item?.thumbnail.replaceAll(/\\/g, '/')) : ''}")`,
                       backgroundPosition: 'center',
                       backgroundSize: 'cover',
                       position: 'relative',
@@ -261,6 +263,7 @@ export default function Home() {
           </Box>
           <Box
             sx={{
+              width: '100%',
               display: 'flex',
               height: '160px',
               flexDirection: 'column',
@@ -346,7 +349,7 @@ export default function Home() {
                     sx={{
                       width: '100%',
                       aspectRatio: 1.25,
-                      backgroundImage: `url('${item?.thumbnail.replaceAll(/\\/g, '/')}')`,
+                      backgroundImage: `url("${item?.thumbnail ? encodeURI(item?.thumbnail.replaceAll(/\\/g, '/')) : ''}")`,
                       backgroundPosition: 'center',
                       backgroundSize: 'cover',
                       backgroundRepeat: 'no-repeat',
@@ -437,6 +440,7 @@ export default function Home() {
               </Grid>
             ))}
           </Grid>
+          {cakeFaceTotalPage > 1 && <Pagination sx={{ marginLeft: 'auto' }} onChange={(e, v) => setPage(v)} count={cakeFaceTotalPage} size="small" />}
         </Container>
       </Box>
     </>

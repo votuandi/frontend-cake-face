@@ -35,23 +35,9 @@ const AppFooter = (props: IProps, ref: React.ForwardedRef<any>) => {
   const dispatch = useDispatch()
   const { banners } = useSelector((state: RootState) => state.banner)
 
-  const [isVertical, setIsVertical] = useState<boolean>(window.innerWidth / window.innerHeight < 1)
-  const [bannerList, setBannerList] = useState<string[]>([...EXAMPLE_BANNER_IMAGES])
-
-  const updateWindowSize = () => {
-    setIsVertical(window.innerWidth / window.innerHeight < 1)
-  }
-
   const fetchData = () => {
     dispatch(getBanners())
   }
-
-  useEffect(() => {
-    window.addEventListener('resize', updateWindowSize)
-    return () => {
-      window.removeEventListener('resize', updateWindowSize)
-    }
-  }, [])
 
   useEffect(() => {
     fetchData()
@@ -68,7 +54,7 @@ const AppFooter = (props: IProps, ref: React.ForwardedRef<any>) => {
                 width: '100%',
                 aspectRatio: isMobile ? 1.6 : 2.4,
                 // backgroundImage: `url(${banner.includes('\\') ? banner.replaceAll('\\', '/') : banner})`,
-                backgroundImage: `url(${banner.path})`,
+                backgroundImage: `url(${encodeURI(banner.path)})`,
                 backgroundPosition: 'center',
                 backgroundSize: 'cover',
               }}

@@ -77,11 +77,7 @@ export default function SignIn() {
           setCookie(COOKIE_ACCESS_TOKEN, loginData.accessToken, { maxAge: MAX_AGE })
           setCookie(COOKIE_REFRESH_TOKEN, loginData.refreshToken, { maxAge: MAX_AGE })
 
-          console.log('loginData', loginData)
-          const accessToken = cookies.get(COOKIE_ACCESS_TOKEN)
-          console.log(accessToken)
-
-          // gotoPage('/')
+          gotoPage('/')
         }
         setSubmitting(false)
       } catch (error) {

@@ -12,6 +12,7 @@ import { getCurrentUserInfo } from '@/store/user/user.action'
 import { cleanCookie } from '@/utils/helpers/cookie'
 import { getSettings } from '@/store/setting/setting.action'
 import Head from 'next/head'
+import { gotoPage } from '@/utils/helpers/common'
 
 export default function Contact() {
   const { t, i18n } = useTranslation()
@@ -39,11 +40,12 @@ export default function Contact() {
     }
   }, [])
 
-  useEffect(() => {
-    if (!currentUserInfo) {
-      router.push('/sign-in')
-    }
-  }, [currentUserInfo])
+  // useEffect(() => {
+  //   if (!isMounted()) return
+  //   if (!currentUserInfo) {
+  //     router.push('/sign-in')
+  //   }
+  // }, [currentUserInfo])
 
   useEffect(() => {
     settings.forEach((x) => {
@@ -97,8 +99,14 @@ export default function Contact() {
               padding: '20px',
             }}
           >
-            <Typography sx={{ fontWeight: 800, fontSize: '24px', color: '#26787c' }}>{currentUserInfo?.name}</Typography>
-            <Typography sx={{ fontWeight: 400, fontSize: '16px', color: '#1a1a1acc' }}>@{currentUserInfo?.userName}</Typography>
+            {!!currentUserInfo ? (
+              <>
+                <Typography sx={{ fontWeight: 800, fontSize: '24px', color: '#26787c' }}>{currentUserInfo?.name}</Typography>
+                <Typography sx={{ fontWeight: 400, fontSize: '16px', color: '#1a1a1acc' }}>@{currentUserInfo?.userName}</Typography>
+              </>
+            ) : (
+              <Typography sx={{ fontWeight: 800, fontSize: '24px', color: '#26787c' }}>Bạn chưa đăng nhập</Typography>
+            )}
           </Box>
           <Box
             sx={{
@@ -110,9 +118,15 @@ export default function Contact() {
               alignItems: 'center',
             }}
           >
-            <Typography onClick={handleSignOut} sx={{ fontWeight: 500, fontSize: '16px', color: '#f2464d', cursor: 'pointer' }}>
-              Đăng xuất
-            </Typography>
+            {!!currentUserInfo ? (
+              <Typography onClick={handleSignOut} sx={{ fontWeight: 500, fontSize: '16px', color: '#f2464d', cursor: 'pointer' }}>
+                Đăng xuất
+              </Typography>
+            ) : (
+              <Typography onClick={() => gotoPage('/sign-in')} sx={{ fontWeight: 500, fontSize: '16px', color: '#f2464d', cursor: 'pointer' }}>
+                Đăng nhập
+              </Typography>
+            )}
           </Box>
         </Box>
       </Box>

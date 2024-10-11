@@ -43,3 +43,9 @@ export type CREATE_SAMPLE_DTO = {
     isActive: '1' | '0'
   }
 }
+
+export type HTML_TO_IMAGE_DTO = {
+  params: {
+    content: string
+  }
+}

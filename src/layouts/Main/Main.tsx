@@ -2,7 +2,7 @@ import AppHeader from '@/components/AppHeader'
 import React, { useEffect, useRef, useState } from 'react'
 import useStyles from './Main.styles'
 import AppFooter from '@/components/AppFooter'
-import { Box, Link, Typography } from '@mui/material'
+import { Box, Container, Link, Typography } from '@mui/material'
 import HomeIcon from '@mui/icons-material/Home'
 import CakeIcon from '@mui/icons-material/Cake'
 import CookieIcon from '@mui/icons-material/Cookie'
@@ -62,8 +62,7 @@ const Main = (props: MainProps) => {
           boxShadow: '1px -3px 10px -4px rgba(0,0,0,0.6)',
           display: 'flex',
           flexDirection: 'row',
-          justifyContent: 'space-between',
-          padding: '8px',
+          justifyContent: 'center',
           alignItems: 'start',
           fontFamily: 'Open Sans',
           textAlign: 'center',
@@ -71,30 +70,40 @@ const Main = (props: MainProps) => {
           borderTopRightRadius: '8px',
         }}
       >
-        <Link href="/" sx={{ textDecoration: 'none' }}>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'start',
-              alignItems: 'center',
-              flex: 1,
-              cursor: 'pointer',
-              height: '100%',
-              borderRadius: '8px',
+        <Container
+          maxWidth="lg"
+          sx={{
+            padding: '8px',
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <Link href="/" sx={{ textDecoration: 'none', width: '100%', flex: 1 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flex: 1,
+                cursor: 'pointer',
+                height: '100%',
+                borderRadius: '8px',
 
-              '&:hover': {
-                backgroundColor: '#629b5c30',
-              },
-            }}
-          >
-            <HomeIcon sx={{ fontSize: '32px', color: '#fff' }} />
-            <Typography className="text-2-line" sx={{ color: '#fff', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase' }}>
-              Trang chủ
-            </Typography>
-          </Box>
-        </Link>
-        {/* <Box
+                '&:hover': {
+                  backgroundColor: '#629b5c30',
+                },
+              }}
+            >
+              <HomeIcon sx={{ fontSize: '32px', color: '#fff' }} />
+              <Typography className="text-2-line" sx={{ color: '#fff', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase' }}>
+                Trang chủ
+              </Typography>
+            </Box>
+          </Link>
+          {/* <Box
           sx={{
             display: 'flex',
             flexDirection: 'column',
@@ -157,58 +166,59 @@ const Main = (props: MainProps) => {
             Tin tức bánh
           </Typography>
         </Box> */}
-        <Link href="/sample/create" sx={{ textDecoration: 'none' }}>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'start',
-              alignItems: 'center',
-              flex: 1,
-              cursor: 'pointer',
-              height: '100%',
-              borderRadius: '8px',
+          <Link href="/sample/create" sx={{ textDecoration: 'none', width: '100%', flex: 1 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flex: 1,
+                cursor: 'pointer',
+                height: '100%',
+                borderRadius: '8px',
 
-              '&:hover': {
-                backgroundColor: '#629b5c30',
-              },
-            }}
-          >
-            <DrawIcon sx={{ fontSize: '32px', color: router.pathname.includes('/sample/create') ? '#0596A6' : '#fff' }} />
-            <Typography
-              className="text-2-line"
-              sx={{ color: router.pathname.includes('/sample/create') ? '#0596A6' : '#fff', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase' }}
+                '&:hover': {
+                  backgroundColor: '#629b5c30',
+                },
+              }}
             >
-              Tạo mẫu
-            </Typography>
-          </Box>
-        </Link>
-        <Link href="/account" sx={{ textDecoration: 'none' }}>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'start',
-              alignItems: 'center',
-              flex: 1,
-              cursor: 'pointer',
-              height: '100%',
-              borderRadius: '8px',
+              <DrawIcon sx={{ fontSize: '32px', color: router.pathname.includes('/sample/create') ? '#0596A6' : '#fff' }} />
+              <Typography
+                className="text-2-line"
+                sx={{ color: router.pathname.includes('/sample/create') ? '#0596A6' : '#fff', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase' }}
+              >
+                Tạo mẫu
+              </Typography>
+            </Box>
+          </Link>
+          <Link href="/account" sx={{ textDecoration: 'none', width: '100%', flex: 1 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flex: 1,
+                cursor: 'pointer',
+                height: '100%',
+                borderRadius: '8px',
 
-              '&:hover': {
-                backgroundColor: '#629b5c30',
-              },
-            }}
-          >
-            <PersonIcon sx={{ fontSize: '32px', color: router.pathname.includes('/account') ? '#0596A6' : '#fff' }} />
-            <Typography
-              className="text-2-line"
-              sx={{ color: router.pathname.includes('/account') ? '#0596A6' : '#fff', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase' }}
+                '&:hover': {
+                  backgroundColor: '#629b5c30',
+                },
+              }}
             >
-              Tài khoản
-            </Typography>
-          </Box>
-        </Link>
+              <PersonIcon sx={{ fontSize: '32px', color: router.pathname.includes('/account') ? '#0596A6' : '#fff' }} />
+              <Typography
+                className="text-2-line"
+                sx={{ color: router.pathname.includes('/account') ? '#0596A6' : '#fff', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase' }}
+              >
+                Tài khoản
+              </Typography>
+            </Box>
+          </Link>
+        </Container>
       </Box>
     </Box>
   )

@@ -29,29 +29,27 @@ const useAuth = () => {
   const cookies = useMemo(() => new Cookies(), [])
 
   useEffect(() => {
-    const accessToken = cookies.get(COOKIE_ACCESS_TOKEN)
-    const refreshToken = cookies.get(COOKIE_REFRESH_TOKEN)
-    const userRole = cookies.get(COOKIE_USER_ROLE)
-
-    if (!accessToken || !refreshToken || !userRole) {
-      // No tokens, user is not logged in
-      if (!PUBLIC_PAGES.includes(router.pathname)) {
-        if (confirm('Bạn không có quyền truy cập trang này. Vui lòng đăng nhập!')) router.push('/sign-in')
-        else router.push('/')
-      }
-    } else {
-      // Tokens exist, check expiration or permissions
-      // Logic for expiration checks (not implemented here)
-
-      const role: Role = userRole
-
-      if (!isPathAccessible(role, router.pathname)) {
-        console.log(2)
-        // Redirect to home page if user tries to access unauthorized page
-        alert('Bạn không có quyền truy cập trang này!')
-        router.push('/')
-      }
-    }
+    // const accessToken = cookies.get(COOKIE_ACCESS_TOKEN)
+    // const refreshToken = cookies.get(COOKIE_REFRESH_TOKEN)
+    // const userRole = cookies.get(COOKIE_USER_ROLE)
+    // if (!accessToken || !refreshToken || !userRole) {
+    //   // No tokens, user is not logged in
+    //   if (router.pathname.startsWith('/cake-face/')) return
+    //   if (!PUBLIC_PAGES.includes(router.pathname)) {
+    //     if (confirm('Bạn không có quyền truy cập trang này. Vui lòng đăng nhập!')) router.push('/sign-in')
+    //     else router.push('/')
+    //   }
+    // } else {
+    //   // Tokens exist, check expiration or permissions
+    //   // Logic for expiration checks (not implemented here)
+    //   const role: Role = userRole
+    //   if (!isPathAccessible(role, router.pathname)) {
+    //     console.log(2)
+    //     // Redirect to home page if user tries to access unauthorized page
+    //     alert('Bạn không có quyền truy cập trang này!')
+    //     router.push('/')
+    //   }
+    // }
   }, [router.pathname, cookies])
 
   return null // or return some state to indicate auth status if needed

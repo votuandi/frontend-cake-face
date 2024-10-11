@@ -262,7 +262,7 @@ export default function AdminSetting() {
                     sx={{
                       width: '100%',
                       height: '200px',
-                      backgroundImage: `url(${currentLogo.small ? currentLogo.small : ' '})`,
+                      backgroundImage: `url(${currentLogo.small ? encodeURI(currentLogo.small) : ' '})`,
                       backgroundPosition: 'center',
                       backgroundSize: 'contain',
                       backgroundRepeat: 'no-repeat',
@@ -294,7 +294,7 @@ export default function AdminSetting() {
                     sx={{
                       width: '100%',
                       height: '200px',
-                      backgroundImage: `url(${currentLogo.full ? currentLogo.full : ''})`,
+                      backgroundImage: `url(${currentLogo.full ? encodeURI(currentLogo.full) : ''})`,
                       backgroundPosition: 'center',
                       backgroundSize: 'contain',
                       backgroundRepeat: 'no-repeat',

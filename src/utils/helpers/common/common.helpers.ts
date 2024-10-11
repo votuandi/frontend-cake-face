@@ -204,3 +204,30 @@ export const parseParams = (params: Object) => {
     .map((x) => `${x[0]}=${x[1]}`)
     .join('&')
 }
+
+export const fetchImageAsBase64 = async (imageUrl: string): Promise<string | undefined> => {
+  try {
+    const response = await fetch(imageUrl)
+    const blob = await response.blob()
+    return blobToBase64(blob)
+  } catch (error) {
+    console.error('Error fetching image:', error)
+    return undefined
+  }
+}
+
+export const blobToBase64 = (blob: Blob): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      const result = reader.result
+      if (typeof result === 'string') {
+        resolve(result)
+      } else {
+        reject('Failed to convert Blob to base64 string.')
+      }
+    }
+    reader.onerror = reject
+    reader.readAsDataURL(blob)
+  })
+}

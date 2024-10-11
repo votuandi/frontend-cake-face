@@ -45,6 +45,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import Link from 'next/link'
 import { getSettings } from '@/store/setting/setting.action'
 import Head from 'next/head'
+import { cakeFaceApi } from '@/utils/api'
 
 type IMAGE_LIST_TYPE = {
   id: string
@@ -93,21 +94,40 @@ export default function CakeFace() {
     dispatch(getSettings())
   }
 
-  const handleClickDownload = () => {
+  const handleClickDownload = async () => {
     if (currentUserInfo?.role && ['admin', 'client'].includes(currentUserInfo?.role)) {
       setShowDownload(true)
+      try {
+        await cakeFaceApi.riseDownload(cakeFaceId)
+      } catch (error) {
+        console.log(error)
+      }
     } else alert('Chỉ khách hàng đã mua máy của Abaso mới tải được file.')
   }
 
   useEffect(() => {
-    if (isMounted()) return
+    const riseView = async (_id: string) => {
+      try {
+        cakeFaceApi.riseView(_id)
+      } catch (error) {
+        console.log(error)
+      }
+    }
     let { slug } = router.query
     let id: string = ''
     if (typeof slug === 'string') {
       id = slug
     }
+    const timer = setTimeout(() => {
+      riseView(id)
+    }, 3000)
+
+    if (isMounted()) return
+
     setCakeFaceId(id)
     FetchData(id)
+
+    return () => clearTimeout(timer)
   }, [])
 
   useEffect(() => {
@@ -155,12 +175,12 @@ export default function CakeFace() {
   return !cakeFaceDetailLoading && !optionListLoading ? (
     <>
       <Head>
-        <title>{`${cakeFaceDetail?.name ? cakeFaceDetail?.name : 'Mẫu bánh'} - Tìm Bánh - Thiên Đường Bánh Thiết Kế Theo Ý Bạn -Timbanh.com`}</title>
+        {/* <title>{`${cakeFaceDetail?.name ? cakeFaceDetail?.name : 'Mẫu bánh'} - Tìm Bánh - Thiên Đường Bánh Thiết Kế Theo Ý Bạn -Timbanh.com`}</title> */}
         <link rel="icon" href={icon} />
-        <meta name="description" content={cakeFaceDetail?.detail ? cakeFaceDetail?.detail : 'Mẫu bánh - Tìm bánh - timbanh.com'} />
+        {/* <meta name="description" content={cakeFaceDetail?.detail ? cakeFaceDetail?.detail : 'Mẫu bánh - Tìm bánh - timbanh.com'} />
         <meta property="og:title" content={`${cakeFaceDetail?.name ? cakeFaceDetail?.name : 'Mẫu bánh'} - Tìm Bánh - Thiên Đường Bánh Thiết Kế Theo Ý Bạn -Timbanh.com`} />
-        <meta property="og:description" content={seoContent} />
-        <meta property="og:image" content={logo} />
+        <meta property="og:description" content={cakeFaceDetail?.detail ? cakeFaceDetail?.detail : ''} />
+        <meta property="og:image" content={cakeFaceDetail?.thumbnail} /> */}
       </Head>
       <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', pt: isMobile ? 0 : '50px' }}>
         <Container
@@ -170,7 +190,7 @@ export default function CakeFace() {
             flexDirection: 'column',
             justifyContent: 'start',
             alignItems: 'start',
-            margin: '0px 0 140px 0',
+            margin: '86px 0 140px 0',
           }}
         >
           <Grid container>
@@ -196,7 +216,7 @@ export default function CakeFace() {
                             width: '100%',
                             // height: '450px',
                             aspectRatio: 1,
-                            backgroundImage: `url(${item?.thumbnail.replaceAll(/\\/g, '/')})`,
+                            backgroundImage: `url(${encodeURI(item?.thumbnail.replaceAll(/\\/g, '/'))})`,
                             backgroundSize: 'contain',
                             backgroundPosition: 'center',
                             backgroundRepeat: 'no-repeat',
@@ -211,7 +231,7 @@ export default function CakeFace() {
                       width: '100%',
                       // height: '450px',
                       aspectRatio: 1,
-                      backgroundImage: `url(${cakeFaceDetail?.thumbnail.replaceAll(/\\/g, '/')})`,
+                      backgroundImage: `url(${cakeFaceDetail?.thumbnail ? encodeURI(cakeFaceDetail?.thumbnail.replaceAll(/\\/g, '/')) : ''})`,
                       backgroundSize: 'contain',
                       backgroundPosition: 'center',
                       backgroundRepeat: 'no-repeat',
@@ -226,7 +246,7 @@ export default function CakeFace() {
                         sx={{
                           width: '120px',
                           height: '120px',
-                          backgroundImage: `url('${opt?.image.replaceAll(/\\/g, '/')}')`,
+                          backgroundImage: `url('${encodeURI(opt?.image.replaceAll(/\\/g, '/'))}')`,
                           backgroundSize: 'cover',
                           backgroundPosition: 'center',
                           backgroundRepeat: 'no-repeat',
@@ -352,72 +372,83 @@ export default function CakeFace() {
             borderTopRightRadius: '8px',
           }}
         >
-          <Box
-            // onClick={() => router.push('/')}
+          <Container
+            maxWidth="lg"
             sx={{
+              padding: '8px',
               display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'start',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
               alignItems: 'center',
-              flex: 1,
-              cursor: 'pointer',
-              height: '100%',
-              borderRadius: '8px',
-
-              '&:hover': {
-                backgroundColor: '#629b5c30',
-              },
             }}
           >
-            <SearchIcon sx={{ fontSize: '36px', color: '#fff' }} />
-            <Typography className="text-2-line" sx={{ color: '#fff', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase' }}>
-              Tìm tiệm bánh
-            </Typography>
-          </Box>
-          <Box
-            // onClick={() => router.push('/account')}
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'start',
-              alignItems: 'center',
-              flex: 1,
-              cursor: 'pointer',
-              height: '100%',
-              borderRadius: '8px',
+            <Box
+              // onClick={() => router.push('/')}
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flex: 1,
+                cursor: 'pointer',
+                height: '100%',
+                borderRadius: '8px',
 
-              '&:hover': {
-                backgroundColor: '#629b5c30',
-              },
-            }}
-          >
-            <ForumIcon sx={{ fontSize: '36px', color: '#fff' }} />
-            <Typography className="text-2-line" sx={{ color: '#fff', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase' }}>
-              Hỗ trợ
-            </Typography>
-          </Box>
-          <Box
-            onClick={handleClickDownload}
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'start',
-              alignItems: 'center',
-              flex: 1,
-              cursor: 'pointer',
-              height: '100%',
-              borderRadius: '8px',
+                '&:hover': {
+                  backgroundColor: '#629b5c30',
+                },
+              }}
+            >
+              <SearchIcon sx={{ fontSize: '36px', color: '#fff' }} />
+              <Typography className="text-2-line" sx={{ color: '#fff', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase' }}>
+                Tìm tiệm bánh
+              </Typography>
+            </Box>
+            <Box
+              // onClick={() => router.push('/account')}
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'start',
+                alignItems: 'center',
+                flex: 1,
+                cursor: 'pointer',
+                height: '100%',
+                borderRadius: '8px',
 
-              '&:hover': {
-                backgroundColor: '#629b5c30',
-              },
-            }}
-          >
-            <DownloadIcon sx={{ fontSize: '36px', color: '#fff' }} />
-            <Typography className="text-2-line" sx={{ color: '#fff', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase' }}>
-              Download File
-            </Typography>
-          </Box>
+                '&:hover': {
+                  backgroundColor: '#629b5c30',
+                },
+              }}
+            >
+              <ForumIcon sx={{ fontSize: '36px', color: '#fff' }} />
+              <Typography className="text-2-line" sx={{ color: '#fff', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase' }}>
+                Hỗ trợ
+              </Typography>
+            </Box>
+            <Box
+              onClick={handleClickDownload}
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'start',
+                alignItems: 'center',
+                flex: 1,
+                cursor: 'pointer',
+                height: '100%',
+                borderRadius: '8px',
+
+                '&:hover': {
+                  backgroundColor: '#629b5c30',
+                },
+              }}
+            >
+              <DownloadIcon sx={{ fontSize: '36px', color: '#fff' }} />
+              <Typography className="text-2-line" sx={{ color: '#fff', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase' }}>
+                Download File
+              </Typography>
+            </Box>
+          </Container>
         </Box>
         <Dialog open={isShowDownload} sx={{ fontFamily: 'Open Sans' }}>
           <DialogTitle>Choose Download Files</DialogTitle>
@@ -448,12 +479,12 @@ export default function CakeFace() {
   ) : (
     <>
       <Head>
-        <title>{`${cakeFaceDetail?.name ? cakeFaceDetail?.name : 'Mẫu bánh'} - Tìm Bánh - Thiên Đường Bánh Thiết Kế Theo Ý Bạn -Timbanh.com`}</title>
+        {/* <title>{`${cakeFaceDetail?.name ? cakeFaceDetail?.name : 'Mẫu bánh'} - Tìm Bánh - Thiên Đường Bánh Thiết Kế Theo Ý Bạn -Timbanh.com`}</title> */}
         <link rel="icon" href={icon} />
-        <meta name="description" content={seoContent} />
+        {/* <meta name="description" content={seoContent} />
         <meta property="og:title" content={`${cakeFaceDetail?.name ? cakeFaceDetail?.name : 'Mẫu bánh'} - Tìm Bánh - Thiên Đường Bánh Thiết Kế Theo Ý Bạn -Timbanh.com`} />
         <meta property="og:description" content={seoContent} />
-        <meta property="og:image" content={logo} />
+        <meta property="og:image" content={logo} /> */}
       </Head>
     </>
   )

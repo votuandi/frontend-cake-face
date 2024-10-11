@@ -53,15 +53,15 @@ const AppHeader = (props: IProps, ref: React.ForwardedRef<any>) => {
     params: {},
   })
 
-  const handleScroll = () => {
-    if (window.scrollY > 50) {
-      setTransparent(false)
-    } else {
-      setTransparent(true)
-    }
-  }
-
   useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setTransparent(false)
+      } else {
+        setTransparent(true)
+      }
+    }
+
     window.addEventListener('scroll', handleScroll)
     return () => {
       window.removeEventListener('scroll', handleScroll)
@@ -90,7 +90,8 @@ const AppHeader = (props: IProps, ref: React.ForwardedRef<any>) => {
     <Box
       className={classes.root}
       sx={{
-        background: isTransparent ? 'transparent' : 'linear-gradient(#c9ffcb, #e4f9c0)',
+        // background: isTransparent ? 'transparent' : 'linear-gradient(#c9ffcb, #e4f9c0)',
+        background: isTransparent ? 'transparent' : '#fff',
         boxShadow: isTransparent ? 'none' : 'rgba(0, 0, 0, 0.1) 0px 4px 12px',
       }}
     >
@@ -116,8 +117,8 @@ const AppHeader = (props: IProps, ref: React.ForwardedRef<any>) => {
             <Box sx={{ width: '90%', maxWidth: '480px', position: 'relative', '& input': { padding: '8px 14px' } }}>
               <TextField
                 sx={{
-                  borderRadius: 'none',
-                  '& .MuiOutlinedInput-root': { borderRadius: '0' },
+                  // borderRadius: 'none',
+                  // '& .MuiOutlinedInput-root': { borderRadius: '0' },
                   '& fieldset': { background: '#fff', zIndex: -1 },
                 }}
                 variant="outlined"
